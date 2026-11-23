@@ -15,6 +15,7 @@ Learners choose a patent system and work through a short micro-course, practise 
 |---|---|
 | **Patent system pathways** | Learners first choose a patent system. The **European patent** pathway is available; further pathways (PCT, USPTO, JPO, CNIPA, MOIP, DPMA, UKIPO) are shown as *coming soon*, and learners can register their interest. |
 | **Micro-course** | Six short lessons on one visual timeline, from filing to opposition. Each lesson ends with one key takeaway. |
+| **Deadline calculator** | Learners enter a filing date and, optionally, the earliest priority date, plus the dates of the search-report and grant mentions once known. Key dates appear on a visual timeline (with a table view), each marked as calculated or depending on an event the learner enters. A learning tool, not legal advice. |
 | **Scenario quiz** | Six questions based on a fictional start-up and its real deadlines, with instant feedback, explanations and a 70% pass mark. |
 | **Certificate** | Unlocked after completing all lessons and passing the quiz. |
 | **AI tutor (mock-up)** | Answers only from a curated set of approved sources and always shows the source. If it can't answer reliably, it says so and hands the question over to a human expert. |
@@ -48,7 +49,7 @@ git clone https://github.com/gizemski/patent-learning-lab.git
 ## Roadmap
 
 - [ ] Add further patent system pathways, starting with the international (PCT) route
-- [ ] Interactive deadline calculator
+- [x] Interactive deadline calculator
 - [ ] AI tutor based on retrieval over approved sources
 - [ ] Learning-progress tracking via open e-learning standards (xAPI)
 - [ ] Short video or animated explainers per lesson
@@ -61,6 +62,12 @@ git clone https://github.com/gizemski/patent-learning-lab.git
 - [European Patent Convention, Art. 99 (Opposition)](https://www.epo.org/en/legal/epc/2020/a99.html)
 - [Guidelines for Examination, General Part](https://epo.org/en/legal/guidelines-epc/2024/foreword_5.html)
 - [EPO – Oppositions](https://epo.org/en/applying/european/oppositions)
+- [European Patent Convention, Art. 93 (Publication of the European patent application)](https://www.epo.org/en/legal/epc/2020/a93.html)
+- [European Patent Convention, Rule 70 (Request for examination)](https://www.epo.org/en/legal/epc/2020/r70.html)
+- [Rules relating to Unitary Patent Protection, Rule 6 (Request for unitary effect)](https://www.epo.org/en/legal/up-upc/2022/upr_6.html)
+- [European Patent Convention, Art. 87 (Priority right)](https://www.epo.org/en/legal/epc/2020/a87.html)
+- [European Patent Convention, Rule 131 (Calculation of periods)](https://www.epo.org/en/legal/epc/2020/r131.html)
+- [European Patent Convention, Rule 134 (Extension of periods)](https://www.epo.org/en/legal/epc/2020/r134.html)
 
 ## Author
 

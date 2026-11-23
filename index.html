@@ -144,6 +144,42 @@ table.map th{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;colo
 .pathpill{display:inline-flex;align-items:center;gap:10px;background:#f1f3f5;border-radius:999px;padding:4px 14px 4px 4px;font-size:.86rem}
 .pathpill a{font-weight:600;font-size:.82rem}
 @media (max-width:900px){.paths{grid-template-columns:repeat(2,1fr)}}
+/* deadline calculator */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.disc{background:var(--hi-soft);border-left:4px solid var(--hi);padding:12px 16px;border-radius:8px;margin:14px 0;max-width:78ch;font-size:.93rem}
+.calc-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:28px;margin-top:18px;align-items:start}
+.calc-wrap h3{margin-bottom:10px}
+.field{margin:0 0 16px}
+.field label{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-weight:600;font-size:.95rem}
+.field .hint{display:block;font-size:.84rem;color:var(--ink2);margin:2px 0 6px;max-width:52ch}
+.calc-wrap input[type=date]{font:inherit;padding:9px 12px;border:1px solid #767f8c;border-radius:10px;width:100%;max-width:240px;min-height:44px;background:#fff;color:var(--ink)}
+.calc-wrap input[aria-invalid="true"]{border-color:var(--bad);border-width:2px}
+.badge.dep{background:var(--hi-soft);color:#8a3d10}
+.badge.in{color:var(--ink2)}
+.badge.wait{background:#fff;border:1px dashed #767f8c;color:var(--ink2)}
+.calc-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.legend{display:flex;flex-direction:column;gap:6px;margin:0 0 14px;padding:0;list-style:none;font-size:.85rem;color:var(--ink2)}
+.legend li{display:flex;gap:8px;align-items:center}
+.ctl{list-style:none;margin:8px 0 0;padding:0}
+.ctl li{position:relative;padding:0 0 18px 46px;min-height:52px}
+.ctl li::before{content:"";position:absolute;left:16px;top:34px;bottom:0;width:2px;background:var(--line)}
+.ctl li:last-child::before{display:none}
+.ctl li.wait::before,.ctl li.dep.none::before{background:repeating-linear-gradient(var(--line) 0 4px,transparent 4px 8px)}
+.dot{position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:.9rem;font-weight:700}
+.dot.in{background:#eceef2;border:2px solid var(--ink2);color:var(--ink)}
+.dot.calc{background:var(--accent);color:#fff}
+.dot.dep{background:var(--hi-soft);border:2px solid var(--hi);color:#8a3d10}
+.dot.wait,.dot.none{background:#fff;border:2px dashed #767f8c;color:var(--ink2)}
+.ev-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ev-name{font-weight:600}
+.ev-date{font-family:"Source Serif 4",Georgia,serif;font-size:1.15rem;font-weight:700;font-variant-numeric:tabular-nums}
+.ev-date.none{font-family:Inter,sans-serif;font-size:.95rem;font-weight:500;color:var(--ink2);font-style:italic}
+.ev-how{font-size:.85rem;color:var(--ink2);max-width:60ch}
+.msgbox{padding:10px 14px;border-radius:10px;margin:0 0 12px;font-size:.9rem}
+.msgbox.err{background:var(--bad-soft);border-left:4px solid var(--bad)}
+.msgbox.warn{background:var(--hi-soft);border-left:4px solid var(--hi)}
+table.data.calc-t td:last-child,table.data.calc-t th:last-child{text-align:left}
+@media (max-width:900px){.calc-wrap{grid-template-columns:1fr}}
 footer{max-width:1120px;margin:0 auto;padding:0 24px 40px;font-size:.82rem;color:var(--muted)}
 footer .card{padding:14px 18px}
 @media (max-width:900px){
@@ -412,8 +448,116 @@ const SRC = {
   guide:{t:"European Patent Guide, 5.4.1 Request for examination",u:"https://www.epo.org/en/legal/guide-epc/2024/ga_c5_4_1.html"},
   a99:{t:"European Patent Convention, Art. 99 (Opposition)",u:"https://www.epo.org/en/legal/epc/2020/a99.html"},
   guidelines:{t:"Guidelines for Examination, General Part",u:"https://epo.org/en/legal/guidelines-epc/2024/foreword_5.html"},
-  oppo:{t:"EPO – Oppositions",u:"https://epo.org/en/applying/european/oppositions"}
+  oppo:{t:"EPO – Oppositions",u:"https://epo.org/en/applying/european/oppositions"},
+  a93:{t:"European Patent Convention, Art. 93 (Publication of the European patent application)",u:"https://www.epo.org/en/legal/epc/2020/a93.html"},
+  r70:{t:"European Patent Convention, Rule 70 (Request for examination)",u:"https://www.epo.org/en/legal/epc/2020/r70.html"},
+  upr6:{t:"Rules relating to Unitary Patent Protection, Rule 6 (Request for unitary effect)",u:"https://www.epo.org/en/legal/up-upc/2022/upr_6.html"},
+  a87:{t:"European Patent Convention, Art. 87 (Priority right)",u:"https://www.epo.org/en/legal/epc/2020/a87.html"},
+  r131:{t:"European Patent Convention, Rule 131 (Calculation of periods)",u:"https://www.epo.org/en/legal/epc/2020/r131.html"},
+  r134:{t:"European Patent Convention, Rule 134 (Extension of periods)",u:"https://www.epo.org/en/legal/epc/2020/r134.html"}
 };
+
+/* ---------- deadline calculator: texts ---------- */
+const CALC = {
+ en:{tab:"Deadline calculator",ey:"European patent · Deadline calculator",h:"Work out the key dates",
+  p:"Enter the filing date and, if you claim priority, the earliest priority date. Some deadlines depend on events that only happen later in the procedure: the mention of the search report and the mention of the grant in the European Patent Bulletin. Enter those dates once you know them.",
+  disc:"<b>Learning tool, not legal advice.</b> The dates are simplified and may not match a real case. Always check the official legal texts and the dates communicated in the proceedings, or ask a professional representative.",
+  formH:"Your dates",req:"Required",opt:"Optional",evIn:"Event you enter",
+  fF:"Filing date",fFh:"Date of filing of the European patent application.",
+  fP:"Earliest priority date",fPh:"Only if you claim priority from an earlier application.",
+  fS:"Mention of the search report",fSh:"Date on which the European Patent Bulletin mentions the publication of the European search report. This cannot be calculated: enter it once it is known.",
+  fG:"Mention of the grant",fGh:"Date on which the European Patent Bulletin mentions the grant of the European patent. This cannot be calculated: enter it once it is known.",
+  example:"Fill in example dates",clear:"Clear all dates",exLbl:"Fictional example dates",
+  resH:"Your timeline",start:"Enter a filing date to see your timeline.",
+  lgCalc:"Calculated from the dates you entered",lgDep:"Depends on an event you enter",lgIn:"Date you entered",lgWait:"Waiting: event not entered yet",
+  bCalc:"Calculated",bDep:"Depends on an event",bIn:"You entered",bWait:"Not entered yet",
+  nPri:"Earliest priority date",nFil:"Filing date",nPub:"Publication of the application",nSrch:"Mention of the search report",nExam:"Request for examination: last day",nGrant:"Mention of the grant",nUp:"Request for unitary effect: last day",nOpp:"Opposition period: last day",
+  basePri:"earliest priority date",baseFil:"filing date",
+  hPub:(b,d)=>`Published as soon as possible after 18 months from the ${b} (${d}).`,
+  hExam:d=>`6 months after the mention of the search report (${d}).`,
+  hUp:d=>`1 month after the mention of the grant (${d}).`,
+  hOpp:d=>`9 months after the mention of the grant (${d}).`,
+  hIn:"Entered in the form.",
+  noDate:"Not calculable yet",noEv:"Not entered yet",
+  wSrch:"Enter the date of the mention of the search report to calculate this deadline.",
+  wGrant:"Enter the date of the mention of the grant to calculate this deadline.",
+  wEv:"Enter this date in the form once it is published in the European Patent Bulletin.",
+  ePri:"The priority date is after the filing date. A priority date must be earlier than the filing date, so it is ignored here.",
+  wPriOld:"The filing date is more than 12 months after the priority date. The priority period is 12 months (Art. 87(1) EPC), so this priority claim may not be valid.",
+  eSrch:"The mention of the search report is before the filing date. Please check this date.",
+  eGrant:"The mention of the grant is before the filing date or before the mention of the search report. Please check this date.",
+  bad:"Please enter a valid date.",
+  rules:"Periods expressed in months end on the day of the later month with the same number as the starting day, or on the last day of that month if it has no such day (Rule 131(4) EPC). If a period ends on a day when the EPO's filing offices are not all open, it is extended to the next day on which they are all open (Rule 134(1) EPC). This tool does not check office closing days.",
+  colStep:"Step",colDate:"Date",colType:"Type",colBasis:"Legal basis",basis:"Legal basis:",
+  lPub:"Art. 93(1) EPC",lExam:"Rule 70(1) EPC",lUp:"Rule 6(1), Rules relating to Unitary Patent Protection",lOpp:"Art. 99(1) EPC",
+  status:(c,w)=>`${c} ${c===1?"date":"dates"} calculated, ${w} waiting for an event you enter.`},
+ de:{tab:"Fristenrechner",ey:"Europäisches Patent · Fristenrechner",h:"Die wichtigsten Daten berechnen",
+  p:"Gib den Anmeldetag ein und, wenn du eine Priorität beanspruchst, den frühesten Prioritätstag. Manche Fristen hängen von Ereignissen ab, die erst später im Verfahren eintreten: dem Hinweis auf den Recherchenbericht und dem Hinweis auf die Erteilung im Europäischen Patentblatt. Gib diese Daten ein, sobald du sie kennst.",
+  disc:"<b>Lernwerkzeug, keine Rechtsberatung.</b> Die Daten sind vereinfacht und können von einem echten Fall abweichen. Prüfe immer die offiziellen Rechtstexte und die im Verfahren mitgeteilten Daten oder frage einen zugelassenen Vertreter.",
+  formH:"Deine Daten",req:"Pflichtfeld",opt:"Optional",evIn:"Ereignis, das du eingibst",
+  fF:"Anmeldetag",fFh:"Tag der Einreichung der europäischen Patentanmeldung.",
+  fP:"Frühester Prioritätstag",fPh:"Nur wenn du die Priorität einer früheren Anmeldung beanspruchst.",
+  fS:"Hinweis auf den Recherchenbericht",fSh:"Tag, an dem im Europäischen Patentblatt auf die Veröffentlichung des europäischen Recherchenberichts hingewiesen wird. Dieses Datum lässt sich nicht berechnen: Gib es ein, sobald es feststeht.",
+  fG:"Hinweis auf die Erteilung",fGh:"Tag, an dem im Europäischen Patentblatt auf die Erteilung des europäischen Patents hingewiesen wird. Dieses Datum lässt sich nicht berechnen: Gib es ein, sobald es feststeht.",
+  example:"Beispieldaten einfügen",clear:"Alle Daten löschen",exLbl:"Fiktive Beispieldaten",
+  resH:"Deine Zeitleiste",start:"Gib einen Anmeldetag ein, um deine Zeitleiste zu sehen.",
+  lgCalc:"Aus deinen eingegebenen Daten berechnet",lgDep:"Hängt von einem Ereignis ab, das du eingibst",lgIn:"Von dir eingegebenes Datum",lgWait:"Offen: Ereignis noch nicht eingegeben",
+  bCalc:"Berechnet",bDep:"Hängt von einem Ereignis ab",bIn:"Von dir eingegeben",bWait:"Noch nicht eingegeben",
+  nPri:"Frühester Prioritätstag",nFil:"Anmeldetag",nPub:"Veröffentlichung der Anmeldung",nSrch:"Hinweis auf den Recherchenbericht",nExam:"Prüfungsantrag: letzter Tag",nGrant:"Hinweis auf die Erteilung",nUp:"Antrag auf einheitliche Wirkung: letzter Tag",nOpp:"Einspruchsfrist: letzter Tag",
+  basePri:"frühesten Prioritätstag",baseFil:"Anmeldetag",
+  hPub:(b,d)=>`Veröffentlichung so bald wie möglich nach Ablauf von 18 Monaten ab dem ${b} (${d}).`,
+  hExam:d=>`6 Monate nach dem Hinweis auf den Recherchenbericht (${d}).`,
+  hUp:d=>`1 Monat nach dem Hinweis auf die Erteilung (${d}).`,
+  hOpp:d=>`9 Monate nach dem Hinweis auf die Erteilung (${d}).`,
+  hIn:"Im Formular eingegeben.",
+  noDate:"Noch nicht berechenbar",noEv:"Noch nicht eingegeben",
+  wSrch:"Gib das Datum des Hinweises auf den Recherchenbericht ein, um diese Frist zu berechnen.",
+  wGrant:"Gib das Datum des Hinweises auf die Erteilung ein, um diese Frist zu berechnen.",
+  wEv:"Gib dieses Datum im Formular ein, sobald es im Europäischen Patentblatt veröffentlicht ist.",
+  ePri:"Der Prioritätstag liegt nach dem Anmeldetag. Ein Prioritätstag muss vor dem Anmeldetag liegen; er wird hier daher nicht berücksichtigt.",
+  wPriOld:"Der Anmeldetag liegt mehr als 12 Monate nach dem Prioritätstag. Die Prioritätsfrist beträgt 12 Monate (Art. 87 (1) EPÜ); dieser Prioritätsanspruch ist daher möglicherweise nicht wirksam.",
+  eSrch:"Der Hinweis auf den Recherchenbericht liegt vor dem Anmeldetag. Bitte prüfe dieses Datum.",
+  eGrant:"Der Hinweis auf die Erteilung liegt vor dem Anmeldetag oder vor dem Hinweis auf den Recherchenbericht. Bitte prüfe dieses Datum.",
+  bad:"Bitte gib ein gültiges Datum ein.",
+  rules:"Nach Monaten bestimmte Fristen enden im maßgeblichen späteren Monat an dem Tag, der durch seine Zahl dem Ausgangstag entspricht, oder am letzten Tag dieses Monats, wenn es diesen Tag nicht gibt (Regel 131 (4) EPÜ). Endet eine Frist an einem Tag, an dem nicht alle Annahmestellen des EPA geöffnet sind, verlängert sie sich bis zum nächsten Tag, an dem alle geöffnet sind (Regel 134 (1) EPÜ). Dieses Werkzeug prüft keine Schließtage.",
+  colStep:"Schritt",colDate:"Datum",colType:"Art",colBasis:"Rechtsgrundlage",basis:"Rechtsgrundlage:",
+  lPub:"Art. 93 (1) EPÜ",lExam:"Regel 70 (1) EPÜ",lUp:"Regel 6 (1) Durchführungsordnung zum einheitlichen Patentschutz",lOpp:"Art. 99 (1) EPÜ",
+  status:(c,w)=>`${c} ${c===1?"Datum":"Daten"} berechnet, ${w} warten auf ein Ereignis, das du eingibst.`},
+ fr:{tab:"Calculateur de délais",ey:"Brevet européen · Calculateur de délais",h:"Calculer les dates clés",
+  p:"Saisissez la date de dépôt et, si vous revendiquez une priorité, la date de priorité la plus ancienne. Certains délais dépendent d'événements qui n'interviennent que plus tard dans la procédure : la mention du rapport de recherche et la mention de la délivrance au Bulletin européen des brevets. Saisissez ces dates dès que vous les connaissez.",
+  disc:"<b>Outil d'apprentissage, pas un conseil juridique.</b> Les dates sont simplifiées et peuvent différer d'un cas réel. Vérifiez toujours les textes juridiques officiels et les dates communiquées dans la procédure, ou consultez un mandataire agréé.",
+  formH:"Vos dates",req:"Obligatoire",opt:"Facultatif",evIn:"Événement à saisir",
+  fF:"Date de dépôt",fFh:"Date de dépôt de la demande de brevet européen.",
+  fP:"Date de priorité la plus ancienne",fPh:"Uniquement si vous revendiquez la priorité d'une demande antérieure.",
+  fS:"Mention du rapport de recherche",fSh:"Date à laquelle le Bulletin européen des brevets mentionne la publication du rapport de recherche européenne. Elle ne peut pas être calculée : saisissez-la dès qu'elle est connue.",
+  fG:"Mention de la délivrance",fGh:"Date à laquelle le Bulletin européen des brevets mentionne la délivrance du brevet européen. Elle ne peut pas être calculée : saisissez-la dès qu'elle est connue.",
+  example:"Insérer des dates d'exemple",clear:"Effacer toutes les dates",exLbl:"Dates d'exemple fictives",
+  resH:"Votre chronologie",start:"Saisissez une date de dépôt pour afficher votre chronologie.",
+  lgCalc:"Calculée à partir des dates saisies",lgDep:"Dépend d'un événement à saisir",lgIn:"Date que vous avez saisie",lgWait:"En attente : événement pas encore saisi",
+  bCalc:"Calculée",bDep:"Dépend d'un événement",bIn:"Saisie par vous",bWait:"Pas encore saisie",
+  nPri:"Date de priorité la plus ancienne",nFil:"Date de dépôt",nPub:"Publication de la demande",nSrch:"Mention du rapport de recherche",nExam:"Requête en examen : dernier jour",nGrant:"Mention de la délivrance",nUp:"Demande d'effet unitaire : dernier jour",nOpp:"Délai d'opposition : dernier jour",
+  basePri:"date de priorité la plus ancienne",baseFil:"date de dépôt",
+  hPub:(b,d)=>`Publiée dès que possible après l'expiration d'un délai de 18 mois à compter de la ${b} (${d}).`,
+  hExam:d=>`6 mois après la mention du rapport de recherche (${d}).`,
+  hUp:d=>`1 mois après la mention de la délivrance (${d}).`,
+  hOpp:d=>`9 mois après la mention de la délivrance (${d}).`,
+  hIn:"Saisie dans le formulaire.",
+  noDate:"Pas encore calculable",noEv:"Pas encore saisie",
+  wSrch:"Saisissez la date de la mention du rapport de recherche pour calculer ce délai.",
+  wGrant:"Saisissez la date de la mention de la délivrance pour calculer ce délai.",
+  wEv:"Saisissez cette date dans le formulaire dès sa publication au Bulletin européen des brevets.",
+  ePri:"La date de priorité est postérieure à la date de dépôt. Une date de priorité doit être antérieure à la date de dépôt ; elle n'est donc pas prise en compte ici.",
+  wPriOld:"La date de dépôt se situe plus de 12 mois après la date de priorité. Le délai de priorité est de 12 mois (art. 87(1) CBE) ; cette revendication de priorité risque donc de ne pas être valable.",
+  eSrch:"La mention du rapport de recherche est antérieure à la date de dépôt. Veuillez vérifier cette date.",
+  eGrant:"La mention de la délivrance est antérieure à la date de dépôt ou à la mention du rapport de recherche. Veuillez vérifier cette date.",
+  bad:"Veuillez saisir une date valide.",
+  rules:"Un délai exprimé en mois expire, dans le mois à prendre en considération, le jour ayant le même quantième que le jour de départ, ou le dernier jour de ce mois s'il n'existe pas de jour ayant le même quantième (règle 131(4) CBE). Si un délai expire un jour où les bureaux de réception de l'OEB ne sont pas tous ouverts, il est prorogé jusqu'au premier jour suivant où ils sont tous ouverts (règle 134(1) CBE). Cet outil ne vérifie pas les jours de fermeture.",
+  colStep:"Étape",colDate:"Date",colType:"Type",colBasis:"Base juridique",basis:"Base juridique :",
+  lPub:"art. 93(1) CBE",lExam:"règle 70(1) CBE",lUp:"règle 6(1) du règlement d'application relatif à la protection unitaire conférée par un brevet",lOpp:"art. 99(1) CBE",
+  status:(c,w)=>`${c} ${c===1?"date calculée":"dates calculées"}, ${w} en attente d'un événement à saisir.`}
+};
+/* fictional example used by "Fill in example dates" (always labelled as fictional) */
+const CALC_EXAMPLE={p:"2025-03-01",f:"2026-02-20",s:"2026-09-02",g:"2028-11-15"};
 
 const KB = [
  {kw:["publish","publication","published","18","veröffentlich","publié","publication","publiée"],src:"basics",
@@ -439,7 +583,7 @@ const DATA = {
 
 /* ---------- state ---------- */
 const KEY="patent-learning-lab-v1";
-let S={lang:"en",done:{},best:null,name:"",path:"epo",interest:{}};
+let S={lang:"en",done:{},best:null,name:"",path:"epo",interest:{},calc:{}};
 try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
 const T=()=>UI[S.lang]; const L=o=>o[S.lang]; const P=()=>PX[S.lang];
@@ -500,6 +644,7 @@ function course(){
   let body="";
   if(view.lesson==="quiz") body=quizView();
   else if(view.lesson==="cert") body=certView();
+  else if(view.lesson==="calc") body=calcView();
   else{
     const i=view.lesson,l=LESSONS[i],last=i===LESSONS.length-1;
     body=`<div class="lesson"><div class="eyebrow">${t.lessonOf(i+1,LESSONS.length)} · ${L(l.when)}</div>
@@ -511,12 +656,115 @@ function course(){
     <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">${pathPill()}<div class="eyebrow">${t.yourProg} · ${pct}%</div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn ${view.lesson==='quiz'?'':'ghost'}" data-open="quiz">🧩 ${t.quizTab}</button>
+        <button class="btn ${view.lesson==='quiz'?'':'ghost'}" data-open="quiz" ${view.lesson==='quiz'?'aria-current="true"':''}>🧩 ${t.quizTab}</button>
+        <button class="btn ${view.lesson==='calc'?'':'ghost'}" data-open="calc" ${view.lesson==='calc'?'aria-current="true"':''}><span aria-hidden="true">📅</span> ${C().tab}</button>
         ${S.best!==null&&S.best>=.7&&doneCount()===6?`<button class="btn ${view.lesson==='cert'?'':'ghost'}" data-open="cert">★ ${t.certTab}</button>`:""}
       </div></div>
     <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>
     <div style="margin-top:16px">${timeline()}</div>${body}</section>`;
   if(view.lesson==="quiz") bindQuiz();
+  if(view.lesson==="calc") drawCalc();
+}
+
+/* ---------- deadline calculator ---------- */
+const C=()=>CALC[S.lang];
+const LOC=()=>({en:"en-GB",de:"de-DE",fr:"fr-FR"}[S.lang]);
+/* parse "YYYY-MM-DD" as a UTC calendar date; null if empty or invalid */
+function pd(s){ if(!/^\d{4}-\d{2}-\d{2}$/.test(s||"")) return null;
+  const [y,m,d]=s.split("-").map(Number), dt=new Date(Date.UTC(y,m-1,d));
+  return dt.getUTCMonth()===m-1&&dt.getUTCDate()===d?dt:null; }
+/* Rule 131(4) EPC: same day number in the later month, or that month's last day */
+function addM(dt,n){ const y=dt.getUTCFullYear(),m=dt.getUTCMonth()+n,d=dt.getUTCDate();
+  const last=new Date(Date.UTC(y,m+1,0)).getUTCDate(); return new Date(Date.UTC(y,m,Math.min(d,last))); }
+const fmtD=dt=>dt.toLocaleDateString(LOC(),{weekday:"short",day:"numeric",month:"long",year:"numeric",timeZone:"UTC"});
+const isoD=dt=>dt.toISOString().slice(0,10);
+let calcTable=false;
+
+function calcView(){
+  const c=C(), v=S.calc||{};
+  const field=(k,lbl,hint,tag,tagCls)=>`<div class="field"><label for="cd-${k}">${lbl} <span class="badge ${tagCls}">${tag}</span></label>
+    <span class="hint" id="cd-${k}-h">${hint}</span>
+    <input type="date" id="cd-${k}" data-calc="${k}" value="${esc(v[k]||"")}" aria-describedby="cd-${k}-h cd-${k}-e" ${k==="f"?'aria-required="true"':''} min="1900-01-01" max="2199-12-31">
+    <span class="hint" id="cd-${k}-e" role="status"></span></div>`;
+  return `<div class="lesson"><div class="eyebrow">${c.ey}</div><h2>${c.h}</h2>
+    <p style="max-width:72ch">${c.p}</p>
+    <div class="disc" role="note">⚠ ${c.disc}</div>
+    <div class="calc-wrap">
+      <form id="calcf" novalidate aria-labelledby="calcf-h" onsubmit="return false">
+        <h3 id="calcf-h">${c.formH}</h3>
+        ${field("f",c.fF,c.fFh,c.req,"ok")}
+        ${field("p",c.fP,c.fPh,c.opt,"in")}
+        ${field("s",c.fS,c.fSh,c.evIn,"dep")}
+        ${field("g",c.fG,c.fGh,c.evIn,"dep")}
+        <div class="calc-btns"><button type="button" class="btn quiet" data-calcex="1">${c.example}</button>
+          <button type="button" class="btn quiet" data-calcclear="1">${c.clear}</button></div>
+      </form>
+      <section aria-labelledby="calcr-h">
+        <div class="chart-head"><h3 id="calcr-h">${c.resH}</h3><button type="button" class="linkbtn" data-calcview="1" aria-controls="calcOut">${calcTable?T().showChart:T().showTable}</button></div>
+        <div id="calcEx"></div>
+        <div id="calcOut"></div>
+        <div class="sr-only" id="calcStatus" aria-live="polite"></div>
+      </section>
+    </div>
+    <p class="notice">${c.rules}</p></div>`;
+}
+
+function calcModel(){
+  const c=C(), v=S.calc||{}, msgs=[], bad={};
+  ["f","p","s","g"].forEach(k=>{ if(v[k]&&!pd(v[k])) bad[k]=true; });
+  const f=pd(v.f); let p=pd(v.p), s=pd(v.s), g=pd(v.g);
+  if(!f) return {start:true,bad,msgs,items:[]};
+  if(p&&p>f){ msgs.push(["err",c.ePri]); bad.p=true; p=null; }
+  else if(p&&addM(p,12)<f) msgs.push(["warn",c.wPriOld]);
+  if(s&&s<f){ msgs.push(["err",c.eSrch]); bad.s=true; s=null; }
+  if(g&&(g<f||(s&&g<s))){ msgs.push(["err",c.eGrant]); bad.g=true; g=null; }
+  const base=p||f, items=[];
+  const ent=(name,dt)=>({k:"in",name,date:dt,how:c.hIn});
+  const ev=(name,dt)=>dt?ent(name,dt):{k:"wait",name,date:null,how:c.wEv};
+  const dep=(name,from,n,how,wait,lbl,src)=>from?{k:"dep",name,date:addM(from,n),how:how(fmtD(from)),lbl,src}:{k:"dep",none:true,name,date:null,how:wait,lbl,src};
+  if(p) items.push(ent(c.nPri,p));
+  items.push(ent(c.nFil,f));
+  items.push({k:"calc",name:c.nPub,date:addM(base,18),how:c.hPub(p?c.basePri:c.baseFil,fmtD(base)),lbl:c.lPub,src:"a93"});
+  items.push(ev(c.nSrch,s));
+  items.push(dep(c.nExam,s,6,c.hExam,c.wSrch,c.lExam,"r70"));
+  items.push(ev(c.nGrant,g));
+  items.push(dep(c.nUp,g,1,c.hUp,c.wGrant,c.lUp,"upr6"));
+  items.push(dep(c.nOpp,g,9,c.hOpp,c.wGrant,c.lOpp,"a99"));
+  return {start:false,bad,msgs,items};
+}
+
+function drawCalc(){
+  const out=document.getElementById("calcOut"); if(!out) return;
+  const c=C(), m=calcModel(), t=T();
+  ["f","p","s","g"].forEach(k=>{const i=document.getElementById("cd-"+k),e=document.getElementById("cd-"+k+"-e");
+    const invalid=!!m.bad[k]; i.setAttribute("aria-invalid",invalid);
+    e.textContent=invalid&&(S.calc[k]&&!pd(S.calc[k]))?c.bad:"";});
+  document.getElementById("calcEx").innerHTML=S.calc.ex?`<p style="margin:0 0 10px"><span class="sample">⚠ ${c.exLbl}</span></p>`:"";
+  const tag=it=>it.k==="calc"?["ok",c.bCalc,"="]:it.k==="in"?["in",c.bIn,"✎"]:it.k==="wait"?["wait",c.bWait,"?"]:it.none?["wait",c.bDep,"…"]:["dep",c.bDep,"⧗"];
+  const msgs=m.msgs.map(x=>`<div class="msgbox ${x[0]}">${x[1]}</div>`).join("");
+  if(m.start){ out.innerHTML=`<p class="muted">${c.start}</p>`; document.getElementById("calcStatus").textContent=""; return; }
+  const dateTxt=it=>it.date?`<time datetime="${isoD(it.date)}">${fmtD(it.date)}</time>`:(it.k==="wait"?c.noEv:c.noDate);
+  const srcA=it=>it.src?` <a href="${SRC[it.src].u}" target="_blank" rel="noopener">${it.lbl}</a>`:"";
+  const legend=`<ul class="legend">
+    <li><span class="badge ok">= ${c.bCalc}</span>${c.lgCalc}</li>
+    <li><span class="badge dep">⧗ ${c.bDep}</span>${c.lgDep}</li>
+    <li><span class="badge in">✎ ${c.bIn}</span>${c.lgIn}</li>
+    <li><span class="badge wait">? ${c.bWait}</span>${c.lgWait}</li></ul>`;
+  let body;
+  if(calcTable){
+    body=`<table class="data calc-t"><caption class="sr-only">${c.resH}</caption><thead><tr><th scope="col">${c.colStep}</th><th scope="col">${c.colDate}</th><th scope="col">${c.colType}</th><th scope="col">${c.colBasis}</th></tr></thead><tbody>${
+      m.items.map(it=>`<tr><th scope="row" style="font-weight:600">${it.name}</th><td>${dateTxt(it)}</td><td>${tag(it)[1]}</td><td>${it.src?srcA(it):"–"}</td></tr>`).join("")}</tbody></table>`;
+  } else {
+    body=legend+`<ol class="ctl">${m.items.map(it=>{const [cls,b,ic]=tag(it);
+      const dotCls=it.k==="calc"?"calc":it.k==="in"?"in":it.k==="wait"?"wait":it.none?"none":"dep";
+      return `<li class="${it.k}${it.none?' none':''}"><span class="dot ${dotCls}" aria-hidden="true">${ic}</span>
+        <div class="ev-top"><span class="ev-name">${it.name}</span><span class="badge ${cls}">${b}</span></div>
+        <div class="ev-date ${it.date?'':'none'}">${dateTxt(it)}</div>
+        <div class="ev-how">${it.how}${it.src?` · ${c.basis}${srcA(it)}`:""}</div></li>`;}).join("")}</ol>`;
+  }
+  out.innerHTML=msgs+body;
+  const calcd=m.items.filter(i=>(i.k==="calc"||i.k==="dep")&&i.date).length, waiting=m.items.filter(i=>i.k==="dep"&&!i.date).length;
+  document.getElementById("calcStatus").textContent=c.status(calcd,waiting);
 }
 
 let picks={};
@@ -649,13 +897,18 @@ document.addEventListener("click",e=>{
   if(th){e.preventDefault();location.hash="home";setTimeout(()=>{const el=document.getElementById("pathways");if(el)el.scrollIntoView();},60);return;}
   const gq=e.target.closest("[data-goquiz]"); if(gq){view.lesson="quiz";}
   const cp=e.target.closest("[data-complete]"); if(cp){const i=+cp.dataset.complete;S.done[i]=true;save();view.lesson=i<LESSONS.length-1?i+1:"quiz";render();scrollTo(0,0);return;}
-  const op=e.target.closest("[data-open]"); if(op){const v=op.dataset.open;if(v==="")return;view.lesson=(v==="quiz"||v==="cert")?v:+v;
+  const cx=e.target.closest("[data-calcex]"); if(cx){S.calc={...CALC_EXAMPLE,ex:true};save();["f","p","s","g"].forEach(k=>{document.getElementById("cd-"+k).value=S.calc[k];});drawCalc();return;}
+  const cc=e.target.closest("[data-calcclear]"); if(cc){S.calc={};save();["f","p","s","g"].forEach(k=>{document.getElementById("cd-"+k).value="";});drawCalc();document.getElementById("cd-f").focus();return;}
+  const cv=e.target.closest("[data-calcview]"); if(cv){calcTable=!calcTable;cv.textContent=calcTable?T().showChart:T().showTable;drawCalc();return;}
+  const op=e.target.closest("[data-open]"); if(op){const v=op.dataset.open;if(v==="")return;view.lesson=(v==="quiz"||v==="cert"||v==="calc")?v:+v;
     if(view.page!=="course"){location.hash="course";} else {render();} scrollTo(0,0);return;}
   const ak=e.target.closest("[data-ask]"); if(ak){ask(ak.dataset.ask);return;}
   const tg=e.target.closest("[data-toggle]"); if(tg){const k=tg.dataset.toggle,c=document.querySelector(`[data-chart="${k}"]`),tb=document.querySelector(`[data-table="${k}"]`);
     const show=tb.hidden; tb.hidden=!show; c.hidden=show; tg.textContent=show?T().showChart:T().showTable;}
 });
-document.addEventListener("input",e=>{if(e.target.id==="cn"){S.name=e.target.value;save();document.getElementById("cno").textContent=S.name||T().yourName;}});
+document.addEventListener("input",e=>{const ck=e.target.dataset&&e.target.dataset.calc;
+  if(ck){S.calc=S.calc||{};S.calc[ck]=e.target.value;delete S.calc.ex;save();drawCalc();return;}
+  if(e.target.id==="cn"){S.name=e.target.value;save();document.getElementById("cno").textContent=S.name||T().yourName;}});
 function route(){const h=location.hash.slice(1);const pages=["home","course","tutor","insights","about"];
   const p=pages.includes(h)?h:"home"; if(p!=="course"&&view.page==="course"&&p!==view.page){} view.page=p; render(); }
 addEventListener("hashchange",()=>{route();scrollTo(0,0);});
