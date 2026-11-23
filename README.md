@@ -3,7 +3,7 @@
 An interactive e-learning prototype that explains how patents are granted, step by step.
 Learners choose a patent system and work through a short micro-course, practise with a realistic scenario, ask an AI tutor and see how learning data can be used to improve the content.
 
-**Live demo:** https://YOUR-USERNAME.github.io/patent-learning-lab/
+**Live demo:** https://gizemski.github.io/patent-learning-lab/
 
 > Concept prototype. Not affiliated with or endorsed by the European Patent Office or any other patent office named. The content is a simplified, entry-level summary and is not legal advice.
 
@@ -42,7 +42,7 @@ AI speeds up drafting, but every fact is checked against official sources before
 No installation needed. Download or clone the repository and open `index.html` in any modern browser.
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/patent-learning-lab.git
+git clone https://github.com/gizemski/patent-learning-lab.git
 ```
 
 ## Roadmap
@@ -66,4 +66,5 @@ git clone https://github.com/YOUR-USERNAME/patent-learning-lab.git
 
 Created by **Gizem Yörür**.
 
+© 2026 Gizem Yörür. All rights reserved.
 © 2026 Gizem Yörür. All rights reserved.
