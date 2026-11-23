@@ -45,7 +45,8 @@ All demo learners, users, figures and log entries are fictional and labelled as 
 
 ```
 index.html             page shell and script tags (order matters)
-css/styles.css
+css/styles.css         all styles; colours, font, radii and spacing are CSS variables at the top
+js/icons.js            simple line icons (ic())
 js/i18n.js             interface strings in EN/DE/FR
 js/pathways.js         list of patent-system pathways
 js/content/epo.js      European pathway: lessons, quiz, sources, tutor knowledge base

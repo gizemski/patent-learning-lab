@@ -3,12 +3,12 @@ function home(){
   const t=T(), started=doneCount()>0;
   app.innerHTML=`<section class="hero">
     <div><div class="eyebrow">${t.heroEy}</div><h1>${t.heroT}</h1><p>${t.heroP}</p>
-      <a class="btn" href="#pathways" data-scroll="pathways">${started?t.cont:t.start} →</a></div>
+      <a class="btn" href="#pathways" data-scroll="pathways">${started?t.cont:t.start}</a></div>
     <div class="tiles">
-      <a class="tile" href="#course"><span class="ico" aria-hidden="true">🧭</span><b>${t.t1}</b><span>${t.t1s}</span></a>
-      <a class="tile" href="#course" data-goquiz="1"><span class="ico" aria-hidden="true">🧩</span><b>${t.t2}</b><span>${t.t2s}</span></a>
-      <a class="tile" href="#tutor"><span class="ico" aria-hidden="true">💬</span><b>${t.t3}</b><span>${t.t3s}</span></a>
-      <a class="tile" href="#progress" data-scroll="progress"><span class="ico" aria-hidden="true">📈</span><b>${R().t4}</b><span>${R().t4s}</span></a>
+      <a class="tile" href="#course"><span class="ico">${ic("book")}</span><b>${t.t1}</b><span>${t.t1s}</span></a>
+      <a class="tile" href="#course" data-goquiz="1"><span class="ico">${ic("quiz")}</span><b>${t.t2}</b><span>${t.t2s}</span></a>
+      <a class="tile" href="#tutor"><span class="ico">${ic("chat")}</span><b>${t.t3}</b><span>${t.t3s}</span></a>
+      <a class="tile" href="#progress" data-scroll="progress"><span class="ico">${ic("chart")}</span><b>${R().t4}</b><span>${R().t4s}</span></a>
     </div></section>
     <section id="pathways" style="margin-bottom:24px"><div class="eyebrow">${P().chooseEy}</div><h2>${P().chooseH}</h2>
       <p class="muted" style="max-width:70ch;margin-top:0">${P().chooseP}</p>
@@ -46,13 +46,13 @@ function pathCard(p){
   return `<div class="path card ${av?'':'soon'} ${sel?'sel':''}">
     <div class="path-top"><span class="ob">${L(p.office)}</span><span class="badge ${av?'ok':''}">${av?x.avail:x.soon}</span></div>
     <b>${L(p.name)}</b><span class="small muted">${p.desc?L(p.desc):x.soonDesc}</span>
-    ${av?`<a class="btn ${sel?'':'ghost'}" href="#course" data-path="${p.id}">${sel?'✓ '+x.selected:x.startPath}</a>`
+    ${av?`<a class="btn ${sel?'':'ghost'}" href="#course" data-path="${p.id}">${sel?ic("check")+x.selected:x.startPath}</a>`
       :`<button class="btn quiet" data-interest="${p.id}" aria-pressed="${int}">${int?x.noted:x.notify}</button>`}</div>`;
 }
 function timeline(){
   return `<div class="tl-wrap"><div class="timeline" role="list">${LESSONS.map((l,i)=>{
     const cls=S.done[i]?"done":(view.page==="course"&&view.lesson===i?"cur":"");
-    return `<button class="step ${cls}" role="listitem" data-open="${i}" aria-label="${esc(L(l.t))}${S.done[i]?' ✓':''}"><span class="node">${S.done[i]?'✓':i+1}</span><span class="lbl">${L(l.t)}</span><span class="when">${L(l.when)}</span></button>`;}).join("")}</div></div>`;
+    return `<button class="step ${cls}" role="listitem" data-open="${i}" aria-label="${esc(L(l.t))}${S.done[i]?' ✓':''}"><span class="node">${S.done[i]?ic("check"):i+1}</span><span class="lbl">${L(l.t)}</span><span class="when">${L(l.when)}</span></button>`;}).join("")}</div></div>`;
 }
 
 /* ---------- course ---------- */
@@ -75,8 +75,8 @@ function course(){
     <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">${pathPill()}<div class="eyebrow">${t.yourProg} · ${pct}%</div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn ${view.lesson==='quiz'?'':'ghost'}" data-open="quiz">🧩 ${t.quizTab}</button>
-        ${S.best!==null&&S.best>=.7&&doneCount()===6?`<button class="btn ${view.lesson==='cert'?'':'ghost'}" data-open="cert">★ ${t.certTab}</button>`:""}
+        <button class="btn ${view.lesson==='quiz'?'':'ghost'}" data-open="quiz">${ic("quiz")}${t.quizTab}</button>
+        ${S.best!==null&&S.best>=.7&&doneCount()===6?`<button class="btn ${view.lesson==='cert'?'':'ghost'}" data-open="cert">${ic("award")}${t.certTab}</button>`:""}
       </div></div>
     <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>
     <div style="margin-top:16px">${timeline()}</div>${body}</section>`;
@@ -87,7 +87,7 @@ let picks={};
 function quizView(){
   const t=T();
   return `<div class="lesson"><div class="eyebrow">${t.quizEy}</div><h2>${t.quizT}</h2>
-    <div class="scenario"><span style="font-size:1.6rem" aria-hidden="true">👩‍🔬</span><div>${L(SCENARIO)}</div></div>
+    <div class="scenario">${L(SCENARIO)}</div>
     <div id="quiz">${QUIZ.map((q,qi)=>`<fieldset class="q"><legend>${qi+1}. ${L(q.q)}</legend>
       ${L(q.o).map((o,oi)=>`<button class="opt" data-q="${qi}" data-o="${oi}" aria-pressed="false">${o}</button>`).join("")}
       <div class="fb" id="fb${qi}" aria-live="polite"></div></fieldset>`).join("")}</div>
@@ -105,7 +105,7 @@ function bindQuiz(){
     QUIZ.forEach((q,qi)=>{const ok=picks[qi]===q.a; if(ok) r++;
       qz.querySelector(`.opt[data-q="${qi}"][data-o="${q.a}"]`).classList.add("right");
       if(!ok) qz.querySelector(`.opt[data-q="${qi}"][data-o="${picks[qi]}"]`).classList.add("wrong");
-      document.getElementById("fb"+qi).textContent=(ok?"✓ "+t.correct:"✗ "+t.notQuite)+" "+L(q.w);});
+      document.getElementById("fb"+qi).innerHTML=(ok?ic("check")+t.correct:ic("x")+t.notQuite)+" "+esc(L(q.w));});
     const sc=r/QUIZ.length,pass=sc>=.7; S.best=Math.max(S.best||0,sc); save(); logEv("quiz",{p:Math.round(sc*100)});
     const all=doneCount()===LESSONS.length;
     res.innerHTML=`<div class="result ${pass?'pass':'fail'}"><b>${t.score(r,QUIZ.length,Math.round(sc*100))}</b> ${pass?t.passed:t.failed}
@@ -149,7 +149,7 @@ function ask(q){ chat.push({me:q}); chat.push({bot:true,...answer(q)}); drawChat
 function drawChat(){
   const c=document.getElementById("chat"); if(!c) return; const t=T();
   c.innerHTML=chat.map(m=>m.me?`<div class="msg me">${esc(m.me)}</div>`:
-    `<div class="msg bot">${m.hello?t.hello:esc(m.text)}${m.src?`<span class="cite">📎 ${t.srcLbl}: <a href="${m.src.u}" target="_blank" rel="noopener">${m.src.t}</a></span>`:""}</div>`).join("");
+    `<div class="msg bot">${m.hello?t.hello:esc(m.text)}${m.src?`<span class="cite">${ic("file")}<span>${t.srcLbl}: <a href="${m.src.u}" target="_blank" rel="noopener">${m.src.t}</a></span></span>`:""}</div>`).join("");
   c.scrollTop=c.scrollHeight;
 }
 

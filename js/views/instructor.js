@@ -20,7 +20,7 @@ function subnav(label,page,items,cur){
 }
 function dashHead(ey,h,p,nav){
   return `<div class="dash-head"><div class="eyebrow">${ey}</div>
-    <div class="dash-title"><h1>${h}</h1><span class="sample">⚠ ${T().sampleLbl}</span></div>
+    <div class="dash-title"><h1>${h}</h1><span class="sample">${ic("alert")}${T().sampleLbl}</span></div>
     <p class="muted" style="max-width:76ch;margin-top:0">${p}</p>${nav}</div>`;
 }
 /* Responsive table: real table semantics, stacked cards on small screens (see .rtable in CSS). */
@@ -64,7 +64,7 @@ function learnersSection(){
     return [`${esc(l.name)} <span class="fict">(${x.fict})</span>`, L(DATA.regions)[l.region],
       `<span class="mini" aria-hidden="true"><i style="width:${Math.round(l.done/n*100)}%"></i></span> ${l.done} / ${n}`,
       l.best===null?`<span class="muted">${x.notYet}</span>`:pct(l.best),
-      cert?`✓ ${x.yes}`:`– ${x.no}`, x.ago(l.last)];});
+      cert?`${ic("check")} ${x.yes}`:`– ${x.no}`, x.ago(l.last)];});
   return `<h2 style="font-size:1.25rem">${x.subLrn}</h2><p class="muted small">${x.lrnSum(DEMO_LEARNERS.length,certs)}</p>`+
     rtable(x.lrnCap,[x.colName,x.colRegion,x.colLessons,x.colBest,x.colCert,x.colLast],rows);
 }
@@ -79,7 +79,7 @@ function previewSection(){
     const u=UI[lg], rx=RX[lg];
     if(sel==="quiz") return `<div class="pv-col" lang="${lg}">${view.allLangs?`<div class="eyebrow">${lg.toUpperCase()}</div>`:""}
       <h3>${u.quizT}</h3><div class="scenario"><div>${SCENARIO[lg]}</div></div>
-      <ol class="pv-quiz">${QUIZ.map(q=>`<li><b>${q.q[lg]}</b><ul>${q.o[lg].map((o,oi)=>`<li class="${oi===q.a?'pv-right':''}">${oi===q.a?`✓ <span class="sr-only">${rx.answer}: </span>`:""}${o}</li>`).join("")}</ul>
+      <ol class="pv-quiz">${QUIZ.map(q=>`<li><b>${q.q[lg]}</b><ul>${q.o[lg].map((o,oi)=>`<li class="${oi===q.a?'pv-right':''}">${oi===q.a?`${ic("check")} <span class="sr-only">${rx.answer}: </span>`:""}${o}</li>`).join("")}</ul>
         <p class="small muted">${q.w[lg]}</p></li>`).join("")}</ol></div>`;
     const l=LESSONS[sel];
     return `<div class="pv-col" lang="${lg}">${view.allLangs?`<div class="eyebrow">${lg.toUpperCase()}</div>`:""}

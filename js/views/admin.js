@@ -13,7 +13,7 @@ function pathwaysSection(){
   const x=R(), px=P();
   const rows=PATHWAYS.map(p=>{const on=pathAvail(p);
     return [`${L(p.name)}`,`<span class="ob">${L(p.office)}</span>`,
-      p.content?`✓ ${x.ready}`:`<span class="muted">${x.noContent}</span>`,
+      p.content?`${ic("check")} ${x.ready}`:`<span class="muted">${x.noContent}</span>`,
       `<button type="button" class="switch" role="switch" aria-checked="${on}" data-pathsw="${p.id}" aria-label="${esc(x.swLbl(L(p.name)))}">
         <span class="knob" aria-hidden="true"></span><span class="sw-txt">${on?px.avail:px.soon}</span></button>`];});
   return `<h2 style="font-size:1.25rem">${x.subPaths}</h2>`+rtable(x.pathsCap,[x.colPath,x.colOffice,x.colContent,x.colStatus],rows);

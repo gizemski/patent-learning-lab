@@ -16,7 +16,8 @@ Guidance for working on **Patent Learning Lab**, a multilingual (English, German
 | File | Contents |
 |---|---|
 | `index.html` | Page shell (header with language and role switchers, `<main>`, footer) and the `<script>` tags. **Load order matters.** |
-| `css/styles.css` | All styles |
+| `css/styles.css` | All styles. Design tokens (colours, font, type sizes, radii, spacing) are CSS variables in `:root` at the top: use them, do not hard-code new values |
+| `js/icons.js` | `ic(name)`: one set of simple line icons (decorative, `aria-hidden`). Use these instead of emojis |
 | `js/i18n.js` | `UI` (interface strings), `PX` (pathway picker), `RX` (roles, dashboards, demo mode, activity-log texts), each `{en,de,fr}` |
 | `js/pathways.js` | `PATHWAYS` list (`avail`, `content`, office and name per language) |
 | `js/content/epo.js` | European pathway: `LESSONS`, `SCENARIO`, `QUIZ`, `SRC`, `KB`. One file per pathway with content (`js/content/<id>.js`) |
@@ -61,7 +62,7 @@ Routes are hashes: `#home`, `#course`, `#tutor`, `#about`, `#instructor[/insight
 
 - **Keyboard:** every interactive element can be reached and used with the keyboard, in a logical order. Use real `<button>`, `<a>`, `<input>` elements, not clickable `<div>`s. Keep the skip link working.
 - **Visible focus:** never remove focus outlines without a clearly visible replacement.
-- **Contrast:** text and meaningful UI elements meet WCAG 2.2 AA contrast (4.5:1 for body text, 3:1 for large text and UI components). Do not convey meaning by colour alone.
+- **Contrast:** text and meaningful UI elements meet WCAG 2.2 AA contrast (the token comments in `css/styles.css` list the checked pairs) (4.5:1 for body text, 3:1 for large text and UI components). Do not convey meaning by colour alone.
 - **Tables:** give every data table a `<caption>` and header cells with `scope`. Wide tables use `rtable()`, which turns rows into stacked cards on phones while keeping table semantics.
 - **Charts:** every chart has a table view (`chartCard` with its *Show table* toggle) and a text alternative (`role="img"` with a descriptive `aria-label`). Any new chart must follow the same pattern.
 - **Dynamic content:** quiz feedback, tutor replies and results are announced via `aria-live`. Toggle buttons use `aria-pressed`; the current page in the navigation uses `aria-current`.
