@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patent Learning Lab: Concept Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202e; --ink2:#465263; --muted:#6a7484; --line:#e2e5ea; --bg:#f6f7f9; --card:#fff;
+  --accent:#0f6b67; --accent-ink:#0b5450; --accent-soft:#e2f1f0;
+  --hi:#b8571c; --hi-soft:#fbece2; --bad:#a83a2c; --bad-soft:#f9e4e0;
+  --r:14px; --focus:0 0 0 3px #0f6b6755;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:16px}
+h1,h2,h3{font-family:"Source Serif 4",Georgia,serif;line-height:1.2;margin:0 0 .45em;font-weight:700}
+h1{font-size:clamp(1.9rem,3.6vw,2.7rem)} h2{font-size:1.6rem} h3{font-size:1.15rem}
+a{color:var(--accent-ink)}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:none;box-shadow:var(--focus);border-radius:8px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:#fff;padding:8px 12px;border-radius:8px;z-index:20}
+.skip:focus{left:8px}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.hdr{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 24px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-family:"Source Serif 4",serif;font-weight:700;font-size:1.2rem}
+.mark{width:32px;height:32px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
+nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+nav a{text-decoration:none;color:var(--ink2);padding:7px 13px;border-radius:999px;font-weight:500;font-size:.95rem}
+nav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent-ink)}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{border:0;background:transparent;padding:6px 11px;font-size:.85rem;font-weight:600;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:#fff}
+main{max-width:1120px;margin:0 auto;padding:32px 24px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.pad{padding:24px 26px}
+.eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink)}
+.muted{color:var(--muted)} .small{font-size:.88rem}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:10px;padding:10px 16px;background:var(--accent);color:#fff;font-weight:600;text-decoration:none}
+.btn:hover{background:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent-ink);border:1px solid var(--accent)}
+.btn.quiet{background:#eceef2;color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.hero{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:center;margin-bottom:28px}
+.hero p{color:var(--ink2);font-size:1.07rem;max-width:56ch}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tile{display:block;text-decoration:none;color:var(--ink);padding:18px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);transition:border-color .2s,transform .2s}
+.tile:hover{border-color:var(--accent);transform:translateY(-2px)}
+.tile b{display:block;font-size:1rem;margin:6px 0 2px}
+.tile span{font-size:.86rem;color:var(--muted)}
+.ico{font-size:1.4rem}
+/* timeline */
+.timeline{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin:8px 0 4px;position:relative}
+.step{position:relative;text-align:center;padding:0 4px;border:0;background:transparent}
+.step::before{content:"";position:absolute;top:17px;left:-50%;width:100%;height:3px;background:var(--line);z-index:0}
+.step:first-child::before{display:none}
+.step.done::before,.step.cur::before{background:var(--accent)}
+.node{position:relative;z-index:1;width:36px;height:36px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;font-weight:700;font-size:.9rem;background:#fff;border:3px solid var(--line);color:var(--muted)}
+.step.done .node{background:var(--accent);border-color:var(--accent);color:#fff}
+.step.cur .node{border-color:var(--accent);color:var(--accent-ink);box-shadow:0 0 0 5px var(--accent-soft)}
+.step .lbl{font-weight:600;font-size:.85rem;display:block}
+.step .when{font-size:.76rem;color:var(--muted);display:block}
+.lesson{margin-top:22px}
+.lesson p{max-width:70ch}
+.callout{background:var(--accent-soft);border-left:4px solid var(--accent);padding:12px 16px;border-radius:8px;margin:16px 0;max-width:70ch}
+.nav-row{display:flex;justify-content:space-between;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.progress{height:8px;background:#e9ecf0;border-radius:99px;overflow:hidden;margin:6px 0}
+.progress i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+/* quiz */
+.scenario{background:var(--hi-soft);border-radius:var(--r);padding:16px 18px;margin:12px 0 4px;display:flex;gap:14px;align-items:flex-start}
+.q{margin:20px 0}
+.q legend{font-weight:600;margin-bottom:8px;padding:0}
+fieldset{border:0;margin:0;padding:0}
+.opt{display:block;width:100%;text-align:left;padding:11px 14px;margin:6px 0;border:1px solid var(--line);border-radius:10px;background:#fff}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--accent);background:var(--accent-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{font-size:.9rem;margin-top:4px;color:var(--ink2)}
+.result{padding:16px 18px;border-radius:var(--r);margin-top:16px}
+.result.pass{background:var(--accent-soft)} .result.fail{background:var(--bad-soft)}
+.cert{border:2px solid var(--ink);border-radius:var(--r);padding:36px 28px;text-align:center;background:linear-gradient(160deg,#fff 40%,var(--accent-soft));margin-top:18px}
+.cert .name{font-family:"Source Serif 4",serif;font-size:1.7rem;border-bottom:1px solid var(--ink);display:inline-block;padding:0 24px 4px;margin:10px 0}
+input[type=text]{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;width:min(340px,100%)}
+/* tutor */
+.chat{display:flex;flex-direction:column;gap:12px;min-height:300px;max-height:460px;overflow:auto;padding:18px;background:#fafbfc;border:1px solid var(--line);border-radius:var(--r)}
+.msg{max-width:80%;padding:11px 14px;border-radius:14px;font-size:.95rem}
+.msg.me{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+.cite{display:block;margin-top:8px;font-size:.8rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.86rem}
+.chip:hover{border-color:var(--accent)}
+.ask{display:flex;gap:8px;margin-top:10px}
+.ask input{flex:1;width:auto}
+.notice{font-size:.84rem;color:var(--ink2);background:#eef0f3;padding:10px 14px;border-radius:10px;margin-top:12px}
+/* insights */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.kpi{padding:16px 18px}
+.kpi b{display:block;font-family:"Source Serif 4",serif;font-size:1.9rem;line-height:1.1}
+.kpi span{font-size:.85rem;color:var(--muted)}
+.charts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.chart-card{padding:18px 18px 14px}
+.chart-card h3{font-size:1rem;font-family:Inter,sans-serif;font-weight:600;margin-bottom:2px}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.linkbtn{border:0;background:none;color:var(--accent-ink);font-size:.8rem;font-weight:600;padding:2px 4px;white-space:nowrap}
+.bars{margin-top:12px}
+.bar-row{display:grid;grid-template-columns:96px 1fr 40px;align-items:center;gap:8px;padding:4px 0;cursor:default;border-radius:6px}
+.bar-row:hover{background:#f2f4f6}
+.bar-row .bl{font-size:.82rem;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-row .bv{font-size:.82rem;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.track{height:14px;position:relative}
+.fill{height:100%;background:var(--accent);border-radius:0 4px 4px 0;min-width:2px}
+.fill.hi{background:var(--hi)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:#fff;font-size:.8rem;padding:7px 10px;border-radius:8px;z-index:30;opacity:0;transition:opacity .12s;max-width:240px}
+table.data{width:100%;border-collapse:collapse;margin-top:10px;font-size:.84rem}
+table.data th,table.data td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.data td:last-child,table.data th:last-child{text-align:right}
+.insights{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.ins{padding:16px 18px;border-left:4px solid var(--hi)}
+.ins .k{font-weight:600}
+.ins .a{margin-top:6px;font-size:.92rem;color:var(--ink2)}
+.ins .a b{color:var(--ink)}
+.sample{display:inline-block;background:var(--hi-soft);color:#8a3d10;font-weight:600;font-size:.78rem;padding:3px 10px;border-radius:99px}
+/* about */
+table.map{width:100%;border-collapse:collapse}
+table.map th,table.map td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.93rem}
+table.map th{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.pipe{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;margin:14px 0}
+.pipe div{flex:1 1 140px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.88rem;position:relative}
+.pipe div b{display:block;font-size:.92rem;margin-bottom:2px}
+.pipe div.human{border-color:var(--accent);background:var(--accent-soft)}
+.paths{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.path{padding:16px;display:flex;flex-direction:column;gap:6px}
+.path .btn{margin-top:auto;justify-content:center;font-size:.88rem;padding:9px 12px}
+.path.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.path.soon b{color:var(--ink2)}
+.path-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.ob{display:inline-grid;place-items:center;min-width:44px;height:26px;padding:0 8px;border-radius:7px;background:var(--ink);color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.04em}
+.path.soon .ob{background:#9aa3b0}
+.badge{white-space:nowrap;font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:99px;background:#eceef2;color:var(--muted)}
+.badge.ok{background:var(--accent-soft);color:var(--accent-ink)}
+.pathpill{display:inline-flex;align-items:center;gap:10px;background:#f1f3f5;border-radius:999px;padding:4px 14px 4px 4px;font-size:.86rem}
+.pathpill a{font-weight:600;font-size:.82rem}
+@media (max-width:900px){.paths{grid-template-columns:repeat(2,1fr)}}
+footer{max-width:1120px;margin:0 auto;padding:0 24px 40px;font-size:.82rem;color:var(--muted)}
+footer .card{padding:14px 18px}
+@media (max-width:900px){
+  .hero,.charts,.insights{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .msg{max-width:92%}
+}
+@media (max-width:640px){
+  header{position:static}
+  .hdr{padding:10px 14px;gap:10px}
+  nav{order:3;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  nav a{white-space:nowrap;padding:6px 11px;font-size:.88rem}
+  .lang{margin-left:auto}
+  main{padding:20px 14px 32px}
+  .pad{padding:18px 16px}
+  .tl-wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+  .timeline{min-width:560px}
+  .timeline .when{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#app" id="skip">Skip to content</a>
+<header>
+  <div class="hdr">
+    <a class="brand" href="#home"><span class="mark" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>
+    </span>Patent Learning Lab</a>
+    <nav id="nav" aria-label="Main"></nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en">EN</button><button data-lang="de">DE</button><button data-lang="fr">FR</button>
+    </div>
+  </div>
+</header>
+<main id="app" tabindex="-1"></main>
+<footer><div class="card" id="foot"></div></footer>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+/* =========================================================
+   Patent Learning Lab: independent concept prototype
+   Content checked against EPO public sources (see About).
+   ========================================================= */
+const UI = {
+  en:{skip:"Skip to content",nav:{home:"Home",course:"Course",tutor:"AI tutor",insights:"Learning insights",about:"About this prototype"},
+    heroEy:"Concept prototype · digital learning",heroT:"Learn how patents are granted, one system at a time.",
+    heroP:"Choose a patent system, then work through a short micro-course, practise with a realistic scenario and ask an AI tutor that answers only from approved sources. The European patent pathway is available now.",
+    start:"Start the course",cont:"Continue the course",
+    t1:"Micro-course",t1s:"6 short lessons on one timeline",t2:"Scenario quiz",t2s:"Apply it to a start-up's real deadlines",t3:"AI tutor",t3s:"Answers with citations, or hands over to a human",t4:"Learning insights",t4s:"From data to a concrete content fix",
+    lessonOf:(i,n)=>`Lesson ${i} of ${n}`,prev:"← Previous",next:"Next →",markNext:"Mark complete & continue →",toQuiz:"Go to the scenario quiz →",
+    yourProg:"Your progress",quizTab:"Scenario quiz",certTab:"Certificate",
+    quizEy:"Scenario quiz · pass mark 70%",quizT:"Apply it: Lena's sensor start-up",submit:"Check my answers",answerAll:n=>`Please answer all ${n} questions first.`,
+    correct:"Correct.",notQuite:"Not quite.",score:(r,n,p)=>`${r} / ${n} correct (${p}%).`,passed:"You passed.",failed:"Not passed yet. Revisit the lessons and try again.",retake:"Retake quiz",getCert:"Get your certificate →",finishLessons:"Complete all six lessons to unlock the certificate.",
+    certEy:"Certificate of completion",certFor:"This certifies that",certDid:p=>`has completed all lessons and passed the scenario assessment with ${p}%.`,yourName:"Your name",certHint:"Type the name for your certificate.",
+    tutorEy:"AI tutor · mock-up",tutorT:"Ask about the grant procedure",tutorP:"The tutor answers only from a curated set of approved sources and always shows where the answer comes from. If it can't answer reliably, it says so and routes the question to a subject-matter expert.",
+    askPh:"Type a question, e.g. When is my application published?",send:"Ask",srcLbl:"Source",
+    hello:"Hello! I can answer questions about the European patent grant procedure, from filing to opposition. What would you like to know?",
+    fallback:"I can't answer that reliably from the approved sources yet. In a live system, this question would be passed to a subject-matter expert, and the answer added to the knowledge base for future learners.",
+    tutorNote:"Prototype note: this mock-up matches questions to a small curated knowledge base. A production version would use retrieval-augmented generation (RAG) over approved learning content, with expert review, logging and data-protection controls.",
+    chips:["When is an application published?","What is the deadline for requesting examination?","How long does the procedure take?","How can I oppose a patent?","How do I get a Unitary Patent?","What does the search report tell me?"],
+    insEy:"Learning insights",insT:"From learner data to better content",sampleLbl:"Illustrative sample data, not real figures",
+    kLearners:"learners enrolled",kComp:"completion rate",kRating:"average rating (of 5)",kTime:"median time to complete",
+    c1:"Learners remaining per lesson",c1s:"Share of enrolled learners who reach each lesson",c2:"Correct answers per quiz question",c2s:"Share of first attempts answered correctly",c3:"Learners by region",c3s:"Share of enrolled learners",
+    showTable:"Show table",showChart:"Show chart",colItem:"Item",colVal:"Value",
+    insH:"What the data says, and what to change",
+    ins:[["Steepest drop-off at Lesson 4 (−22 points)","<b>Action:</b> split \"Examination\" into two micro-lessons and add an interactive deadline calculator."],
+         ["Only 47% get the examination-deadline question right","<b>Action:</b> add a worked timeline example and review the question wording with a subject-matter expert."],
+         ["21% of learners come from Asia","<b>Action:</b> prioritise captions and additional language versions, and offer live Q&A at time-zone-friendly hours."]],
+    yourSess:"Live from your session",yourSessP:(l,q)=>`Lessons completed: ${l} of 6 · Best quiz score: ${q}`,
+    aboutEy:"About this prototype",aboutT:"How it is built",
+    aboutP:"An independent concept exploring how learning about patent procedures can be made accessible, engaging and measurable, combining clear content design, responsible use of AI and learning analytics.",
+    mapH:["Building block","What it does"],
+    map:[["Content design","A structured micro-course: one visual timeline, short lessons with one key takeaway each, a scenario-based assessment and a certificate."],
+         ["Responsible AI","An AI tutor designed around clear rules: it answers only from approved sources, always cites them, and hands over to a human when unsure."],
+         ["Accurate subject matter","Lesson content written and checked against public sources from the patent office concerned (for the European pathway: European Patent Guide, EPC, Guidelines)."],
+         ["Learning analytics","An insights view that links each metric to a concrete content decision, not just a report."],
+         ["Platform integration","Built as a lightweight, standalone prototype. It follows open e-learning standards, so in a production setting progress could be recorded as xAPI statements and courses delivered through any standards-based learning platform."],
+         ["Accessibility and languages","Available in English, German and French, keyboard-navigable, with skip link, visible focus and a table view for every chart."],
+         ["Scalable pathways","Each patent system is a separate content module using the same course, quiz, tutor and analytics structure. Learner interest in upcoming pathways helps decide what to build next."]],
+    pipeH:"The AI-assisted content workflow behind it",
+    pipe:[["1 · Source","Approved legal texts and guides"],["2 · AI draft","Lessons, quiz items, translations"],["3 · Expert review","A subject-matter expert checks every fact",1],["4 · Accessibility","Language, contrast, keyboard, captions"],["5 · Publish","On the learning platform"],["6 · Measure","Analytics feed the next revision",1]],
+    pipeNote:"Human checkpoints are highlighted: in patent education, accuracy is non-negotiable, so AI speeds up drafting but never replaces expert sign-off.",
+    srcH:"Sources used for the content",
+    foot:"Independent concept prototype by Gizem Yörür. Not affiliated with or endorsed by the European Patent Office or any other patent office named. Content is a simplified entry-level summary based on EPO public sources; it is not legal advice. Progress is stored only in your browser.",
+    reset:"Reset my progress",resetConfirm:"Click again to confirm"
+  },
+  de:{skip:"Zum Inhalt springen",nav:{home:"Start",course:"Kurs",tutor:"KI-Tutor",insights:"Lern-Insights",about:"Über den Prototyp"},
+    heroEy:"Konzept-Prototyp · digitales Lernen",heroT:"Verstehen, wie Patente erteilt werden – System für System.",
+    heroP:"Wähle ein Patentsystem, arbeite einen kurzen Mikrokurs durch, übe an einem realistischen Szenario und frage einen KI-Tutor, der nur aus freigegebenen Quellen antwortet. Der Pfad zum europäischen Patent ist bereits verfügbar.",
+    start:"Kurs starten",cont:"Kurs fortsetzen",
+    t1:"Mikrokurs",t1s:"6 kurze Lektionen auf einer Zeitleiste",t2:"Szenario-Quiz",t2s:"Anwendung auf echte Fristen eines Start-ups",t3:"KI-Tutor",t3s:"Antworten mit Quellenangabe – oder Übergabe an einen Menschen",t4:"Lern-Insights",t4s:"Von Daten zur konkreten Inhaltsverbesserung",
+    lessonOf:(i,n)=>`Lektion ${i} von ${n}`,prev:"← Zurück",next:"Weiter →",markNext:"Abschließen & weiter →",toQuiz:"Zum Szenario-Quiz →",
+    yourProg:"Dein Fortschritt",quizTab:"Szenario-Quiz",certTab:"Zertifikat",
+    quizEy:"Szenario-Quiz · Bestehensgrenze 70 %",quizT:"Anwenden: Lenas Sensor-Start-up",submit:"Antworten prüfen",answerAll:n=>`Bitte beantworte zuerst alle ${n} Fragen.`,
+    correct:"Richtig.",notQuite:"Nicht ganz.",score:(r,n,p)=>`${r} / ${n} richtig (${p} %).`,passed:"Bestanden.",failed:"Noch nicht bestanden. Sieh dir die Lektionen noch einmal an und versuche es erneut.",retake:"Quiz wiederholen",getCert:"Zertifikat erhalten →",finishLessons:"Schließe alle sechs Lektionen ab, um das Zertifikat freizuschalten.",
+    certEy:"Teilnahmezertifikat",certFor:"Hiermit wird bestätigt, dass",certDid:p=>`alle Lektionen abgeschlossen und die Szenario-Prüfung mit ${p} % bestanden hat.`,yourName:"Dein Name",certHint:"Gib den Namen für dein Zertifikat ein.",
+    tutorEy:"KI-Tutor · Mock-up",tutorT:"Fragen zum Erteilungsverfahren",tutorP:"Der Tutor antwortet nur aus einer kuratierten Auswahl freigegebener Quellen und zeigt immer, woher die Antwort stammt. Kann er nicht verlässlich antworten, sagt er das und leitet die Frage an eine Fachperson weiter.",
+    askPh:"Frage eingeben, z. B. Wann wird meine Anmeldung veröffentlicht?",send:"Fragen",srcLbl:"Quelle",
+    hello:"Hallo! Ich beantworte Fragen zum europäischen Patenterteilungsverfahren – von der Anmeldung bis zum Einspruch. Was möchtest du wissen?",
+    fallback:"Das kann ich aus den freigegebenen Quellen noch nicht verlässlich beantworten. In einem Live-System würde die Frage an eine Fachperson weitergeleitet und die Antwort für künftige Lernende in die Wissensbasis aufgenommen.",
+    tutorNote:"Hinweis zum Prototyp: Dieses Mock-up ordnet Fragen einer kleinen kuratierten Wissensbasis zu. Eine Produktivversion würde Retrieval-Augmented Generation (RAG) über freigegebene Lerninhalte nutzen – mit Expertenprüfung, Protokollierung und Datenschutzkontrollen.",
+    chips:["Wann wird eine Anmeldung veröffentlicht?","Welche Frist gilt für den Prüfungsantrag?","Wie lange dauert das Verfahren?","Wie lege ich Einspruch ein?","Wie erhalte ich ein Einheitspatent?","Was sagt mir der Recherchenbericht?"],
+    insEy:"Lern-Insights",insT:"Von Lerndaten zu besseren Inhalten",sampleLbl:"Illustrative Beispieldaten, keine echten Zahlen",
+    kLearners:"eingeschriebene Lernende",kComp:"Abschlussquote",kRating:"Durchschnittsbewertung (von 5)",kTime:"mittlere Bearbeitungszeit",
+    c1:"Verbleibende Lernende je Lektion",c1s:"Anteil der Eingeschriebenen, die jede Lektion erreichen",c2:"Richtige Antworten je Quizfrage",c2s:"Anteil richtiger Antworten im ersten Versuch",c3:"Lernende nach Region",c3s:"Anteil der Eingeschriebenen",
+    showTable:"Tabelle zeigen",showChart:"Diagramm zeigen",colItem:"Element",colVal:"Wert",
+    insH:"Was die Daten sagen – und was sich ändern sollte",
+    ins:[["Stärkster Abbruch bei Lektion 4 (−22 Punkte)","<b>Maßnahme:</b> „Prüfung“ in zwei Mikrolektionen aufteilen und einen interaktiven Fristenrechner ergänzen."],
+         ["Nur 47 % beantworten die Frage zur Prüfungsantragsfrist richtig","<b>Maßnahme:</b> ein durchgerechnetes Zeitleisten-Beispiel ergänzen und die Formulierung mit einer Fachperson prüfen."],
+         ["21 % der Lernenden kommen aus Asien","<b>Maßnahme:</b> Untertitel und weitere Sprachversionen priorisieren und Live-Q&A zu zeitzonenfreundlichen Zeiten anbieten."]],
+    yourSess:"Live aus deiner Sitzung",yourSessP:(l,q)=>`Abgeschlossene Lektionen: ${l} von 6 · Bestes Quizergebnis: ${q}`,
+    aboutEy:"Über den Prototyp",aboutT:"Wie er aufgebaut ist",
+    aboutP:"Ein unabhängiges Konzept, das erkundet, wie Lernen über Patentverfahren zugänglich, ansprechend und messbar werden kann – durch klares Content-Design, verantwortungsvollen KI-Einsatz und Lernanalysen.",
+    mapH:["Baustein","Was er leistet"],
+    map:[["Content-Design","Ein strukturierter Mikrokurs: eine visuelle Zeitleiste, kurze Lektionen mit je einer Kernaussage, eine szenariobasierte Prüfung und ein Zertifikat."],
+         ["Verantwortungsvolle KI","Ein KI-Tutor mit klaren Regeln: antwortet nur aus freigegebenen Quellen, nennt sie immer und übergibt bei Unsicherheit an einen Menschen."],
+         ["Fachliche Genauigkeit","Lektionsinhalte, geschrieben und geprüft anhand öffentlicher Quellen des jeweiligen Patentamts (für den europäischen Pfad: Europäischer Patentleitfaden, EPÜ, Richtlinien)."],
+         ["Lernanalysen","Eine Insights-Ansicht, die jede Kennzahl mit einer konkreten Inhaltsentscheidung verknüpft – nicht nur ein Bericht."],
+         ["Plattform-Integration","Als schlanker, eigenständiger Prototyp gebaut. Er orientiert sich an offenen E-Learning-Standards, sodass im Produktivbetrieb der Fortschritt als xAPI-Statements erfasst und Kurse über jede standardbasierte Lernplattform ausgeliefert werden könnten."],
+         ["Barrierefreiheit und Sprachen","Verfügbar auf Englisch, Deutsch und Französisch, per Tastatur bedienbar, mit Sprunglink, sichtbarem Fokus und Tabellenansicht für jedes Diagramm."],
+         ["Skalierbare Lernpfade","Jedes Patentsystem ist ein eigenes Inhaltsmodul mit derselben Struktur aus Kurs, Quiz, Tutor und Analysen. Das Interesse der Lernenden an kommenden Pfaden hilft bei der Entscheidung, was als Nächstes entsteht."]],
+    pipeH:"Der KI-gestützte Content-Workflow dahinter",
+    pipe:[["1 · Quelle","Freigegebene Rechtstexte und Leitfäden"],["2 · KI-Entwurf","Lektionen, Quizfragen, Übersetzungen"],["3 · Expertenprüfung","Eine Fachexpertin prüft jede Aussage",1],["4 · Barrierefreiheit","Sprache, Kontrast, Tastatur, Untertitel"],["5 · Veröffentlichen","Auf der Lernplattform"],["6 · Messen","Analysen fließen in die nächste Version",1]],
+    pipeNote:"Menschliche Prüfpunkte sind hervorgehoben: In der Patentausbildung ist Genauigkeit nicht verhandelbar – KI beschleunigt das Entwerfen, ersetzt aber nie die Freigabe durch Fachleute.",
+    srcH:"Für die Inhalte verwendete Quellen",
+    foot:"Unabhängiger Konzept-Prototyp von Gizem Yörür. Nicht mit dem Europäischen Patentamt oder einem anderen genannten Patentamt verbunden oder von ihnen unterstützt. Die Inhalte sind eine vereinfachte Einführung auf Basis öffentlicher EPA-Quellen und keine Rechtsberatung. Der Fortschritt wird nur in deinem Browser gespeichert.",
+    reset:"Fortschritt zurücksetzen",resetConfirm:"Zum Bestätigen erneut klicken"
+  },
+  fr:{skip:"Aller au contenu",nav:{home:"Accueil",course:"Cours",tutor:"Tuteur IA",insights:"Analyse de l'apprentissage",about:"À propos du prototype"},
+    heroEy:"Prototype de concept · apprentissage numérique",heroT:"Comprendre la délivrance des brevets, système par système.",
+    heroP:"Choisissez un système de brevets, suivez un court micro-cours, entraînez-vous sur un scénario réaliste et interrogez un tuteur IA qui répond uniquement à partir de sources validées. Le parcours du brevet européen est disponible dès maintenant.",
+    start:"Commencer le cours",cont:"Reprendre le cours",
+    t1:"Micro-cours",t1s:"6 leçons courtes sur une frise chronologique",t2:"Quiz scénario",t2s:"Appliquer aux délais réels d'une start-up",t3:"Tuteur IA",t3s:"Réponses sourcées, ou relais vers un humain",t4:"Analyse de l'apprentissage",t4s:"Des données à une amélioration concrète",
+    lessonOf:(i,n)=>`Leçon ${i} sur ${n}`,prev:"← Précédent",next:"Suivant →",markNext:"Terminer et continuer →",toQuiz:"Aller au quiz scénario →",
+    yourProg:"Votre progression",quizTab:"Quiz scénario",certTab:"Certificat",
+    quizEy:"Quiz scénario · seuil de réussite 70 %",quizT:"Mise en pratique : la start-up de capteurs de Lena",submit:"Vérifier mes réponses",answerAll:n=>`Veuillez d'abord répondre aux ${n} questions.`,
+    correct:"Correct.",notQuite:"Pas tout à fait.",score:(r,n,p)=>`${r} / ${n} bonnes réponses (${p} %).`,passed:"Réussi.",failed:"Pas encore réussi. Revoyez les leçons et réessayez.",retake:"Refaire le quiz",getCert:"Obtenir votre certificat →",finishLessons:"Terminez les six leçons pour débloquer le certificat.",
+    certEy:"Certificat de réussite",certFor:"Il est certifié que",certDid:p=>`a suivi toutes les leçons et réussi l'évaluation par scénario avec ${p} %.`,yourName:"Votre nom",certHint:"Saisissez le nom à faire figurer sur le certificat.",
+    tutorEy:"Tuteur IA · maquette",tutorT:"Posez vos questions sur la procédure de délivrance",tutorP:"Le tuteur répond uniquement à partir d'un ensemble de sources validées et indique toujours l'origine de sa réponse. S'il ne peut pas répondre de manière fiable, il le dit et transmet la question à un expert du domaine.",
+    askPh:"Posez une question, p. ex. Quand ma demande est-elle publiée ?",send:"Envoyer",srcLbl:"Source",
+    hello:"Bonjour ! Je réponds aux questions sur la procédure de délivrance du brevet européen, du dépôt à l'opposition. Que souhaitez-vous savoir ?",
+    fallback:"Je ne peux pas encore répondre de manière fiable à partir des sources validées. Dans un système réel, la question serait transmise à un expert du domaine et la réponse ajoutée à la base de connaissances pour les futurs apprenants.",
+    tutorNote:"Note sur le prototype : cette maquette associe les questions à une petite base de connaissances. Une version de production utiliserait la génération augmentée par récupération (RAG) sur des contenus pédagogiques validés, avec relecture par des experts, journalisation et contrôles de protection des données.",
+    chips:["Quand une demande est-elle publiée ?","Quel est le délai pour la requête en examen ?","Combien de temps dure la procédure ?","Comment former opposition ?","Comment obtenir un brevet unitaire ?","Que m'apprend le rapport de recherche ?"],
+    insEy:"Analyse de l'apprentissage",insT:"Des données d'apprentissage à de meilleurs contenus",sampleLbl:"Données d'exemple, chiffres non réels",
+    kLearners:"apprenants inscrits",kComp:"taux de réussite du cours",kRating:"note moyenne (sur 5)",kTime:"durée médiane",
+    c1:"Apprenants restants par leçon",c1s:"Part des inscrits qui atteignent chaque leçon",c2:"Bonnes réponses par question",c2s:"Part de bonnes réponses au premier essai",c3:"Apprenants par région",c3s:"Part des inscrits",
+    showTable:"Afficher le tableau",showChart:"Afficher le graphique",colItem:"Élément",colVal:"Valeur",
+    insH:"Ce que disent les données, et ce qu'il faut changer",
+    ins:[["Plus forte baisse à la leçon 4 (−22 points)","<b>Action :</b> scinder « Examen » en deux micro-leçons et ajouter un calculateur de délais interactif."],
+         ["Seuls 47 % répondent correctement à la question sur le délai d'examen","<b>Action :</b> ajouter un exemple chronologique détaillé et revoir la formulation avec un expert du domaine."],
+         ["21 % des apprenants viennent d'Asie","<b>Action :</b> prioriser les sous-titres et d'autres versions linguistiques, et proposer des sessions de questions-réponses à des horaires adaptés aux fuseaux."]],
+    yourSess:"En direct de votre session",yourSessP:(l,q)=>`Leçons terminées : ${l} sur 6 · Meilleur score au quiz : ${q}`,
+    aboutEy:"À propos du prototype",aboutT:"Comment il est conçu",
+    aboutP:"Un concept indépendant qui explore comment rendre l'apprentissage des procédures de brevets accessible, engageant et mesurable, en combinant une conception de contenu claire, un usage responsable de l'IA et l'analyse de l'apprentissage.",
+    mapH:["Composant","Ce qu'il apporte"],
+    map:[["Conception du contenu","Un micro-cours structuré : une frise visuelle, des leçons courtes avec un message clé chacune, une évaluation par scénario et un certificat."],
+         ["IA responsable","Un tuteur IA conçu autour de règles claires : il répond uniquement à partir de sources validées, les cite toujours et passe la main à un humain en cas de doute."],
+         ["Exactitude du contenu","Contenus rédigés et vérifiés à partir de sources publiques de l'office concerné (pour le parcours européen : Guide du brevet européen, CBE, Directives)."],
+         ["Analyse de l'apprentissage","Une vue d'analyse qui relie chaque indicateur à une décision concrète sur le contenu, pas seulement un rapport."],
+         ["Intégration à une plateforme","Conçu comme un prototype léger et autonome. Il suit les standards ouverts du e-learning : en production, la progression pourrait être enregistrée sous forme d'énoncés xAPI et les cours diffusés via toute plateforme d'apprentissage compatible."],
+         ["Accessibilité et langues","Disponible en anglais, allemand et français, navigable au clavier, avec lien d'évitement, focus visible et vue tableau pour chaque graphique."],
+         ["Parcours évolutifs","Chaque système de brevets est un module de contenu distinct, avec la même structure de cours, quiz, tuteur et analyses. L'intérêt des apprenants pour les parcours à venir aide à décider lequel développer ensuite."]],
+    pipeH:"Le flux de production assisté par IA",
+    pipe:[["1 · Source","Textes juridiques et guides validés"],["2 · Brouillon IA","Leçons, questions, traductions"],["3 · Relecture experte","Un expert vérifie chaque fait",1],["4 · Accessibilité","Langue, contraste, clavier, sous-titres"],["5 · Publication","Sur la plateforme d'apprentissage"],["6 · Mesure","Les analyses nourrissent la révision suivante",1]],
+    pipeNote:"Les points de contrôle humains sont mis en évidence : en formation sur les brevets, l'exactitude n'est pas négociable. L'IA accélère la rédaction mais ne remplace jamais la validation par un expert.",
+    srcH:"Sources utilisées pour les contenus",
+    foot:"Prototype de concept indépendant réalisé par Gizem Yörür. Sans lien avec l'Office européen des brevets ni avec aucun autre office cité, et non approuvé par ceux-ci. Les contenus sont un résumé simplifié de niveau débutant fondé sur des sources publiques de l'OEB ; ils ne constituent pas un conseil juridique. La progression est enregistrée uniquement dans votre navigateur.",
+    reset:"Réinitialiser ma progression",resetConfirm:"Cliquez à nouveau pour confirmer"
+  }
+};
+
+/* ---------- Pathways: each patent system is a content module ---------- */
+const PATHWAYS = [
+ {id:"epo",avail:true,office:{en:"EPO",de:"EPA",fr:"OEB"},name:{en:"European patent",de:"Europäisches Patent",fr:"Brevet européen"},
+  desc:{en:"Grant procedure under the European Patent Convention, from filing to opposition.",de:"Erteilungsverfahren nach dem Europäischen Patentübereinkommen, von der Anmeldung bis zum Einspruch.",fr:"Procédure de délivrance selon la Convention sur le brevet européen, du dépôt à l'opposition."}},
+ {id:"pct",office:{en:"WIPO",de:"WIPO",fr:"OMPI"},name:{en:"International application (PCT)",de:"Internationale Anmeldung (PCT)",fr:"Demande internationale (PCT)"},
+  desc:{en:"The Patent Cooperation Treaty route: one application, many countries.",de:"Der Weg über den Vertrag über die internationale Zusammenarbeit: eine Anmeldung, viele Länder.",fr:"La voie du Traité de coopération en matière de brevets : une demande, de nombreux pays."}},
+ {id:"us",office:{en:"USPTO",de:"USPTO",fr:"USPTO"},name:{en:"United States",de:"Vereinigte Staaten",fr:"États-Unis"},desc:null},
+ {id:"jp",office:{en:"JPO",de:"JPO",fr:"JPO"},name:{en:"Japan",de:"Japan",fr:"Japon"},desc:null},
+ {id:"cn",office:{en:"CNIPA",de:"CNIPA",fr:"CNIPA"},name:{en:"China",de:"China",fr:"Chine"},desc:null},
+ {id:"kr",office:{en:"MOIP",de:"MOIP",fr:"MOIP"},name:{en:"Republic of Korea",de:"Republik Korea",fr:"République de Corée"},desc:null},
+ {id:"de",office:{en:"DPMA",de:"DPMA",fr:"DPMA"},name:{en:"Germany",de:"Deutschland",fr:"Allemagne"},desc:null},
+ {id:"uk",office:{en:"UKIPO",de:"UKIPO",fr:"UKIPO"},name:{en:"United Kingdom",de:"Vereinigtes Königreich",fr:"Royaume-Uni"},desc:null}
+];
+const PX = {
+ en:{chooseEy:"Step 1",chooseH:"Choose your patent system",chooseP:"Each patent system has its own pathway. The European patent pathway is available now; the others are in preparation.",
+   avail:"Available",soon:"Coming soon",startPath:"Start this pathway",selected:"Selected",notify:"I'm interested",noted:"✓ Interest noted",
+   soonDesc:"National grant procedure: pathway in preparation.",interestNote:"Interest is counted to decide which pathway to build next.",pathLbl:"Pathway",change:"Change"},
+ de:{chooseEy:"Schritt 1",chooseH:"Wähle dein Patentsystem",chooseP:"Jedes Patentsystem hat seinen eigenen Lernpfad. Der Pfad zum europäischen Patent ist bereits verfügbar, die anderen sind in Vorbereitung.",
+   avail:"Verfügbar",soon:"Demnächst",startPath:"Diesen Pfad starten",selected:"Ausgewählt",notify:"Interessiert mich",noted:"✓ Interesse vermerkt",
+   soonDesc:"Nationales Erteilungsverfahren: Lernpfad in Vorbereitung.",interestNote:"Das Interesse wird gezählt, um zu entscheiden, welcher Pfad als Nächstes entsteht.",pathLbl:"Lernpfad",change:"Ändern"},
+ fr:{chooseEy:"Étape 1",chooseH:"Choisissez votre système de brevets",chooseP:"Chaque système de brevets a son propre parcours. Le parcours du brevet européen est disponible ; les autres sont en préparation.",
+   avail:"Disponible",soon:"Bientôt",startPath:"Commencer ce parcours",selected:"Sélectionné",notify:"Ça m'intéresse",noted:"✓ Intérêt enregistré",
+   soonDesc:"Procédure nationale de délivrance : parcours en préparation.",interestNote:"L'intérêt est comptabilisé pour décider quel parcours développer ensuite.",pathLbl:"Parcours",change:"Modifier"}
+};
+
+const LESSONS = [
+ {when:{en:"Day 0",de:"Tag 0",fr:"Jour 0"},
+  t:{en:"Filing & formalities",de:"Anmeldung & Formalprüfung",fr:"Dépôt et formalités"},
+  b:{en:"A European patent application can be filed online with the EPO or, in many cases, with a national patent office. It can be filed in any language, but the proceedings are conducted in one of the EPO's three official languages: English, French or German. The Receiving Section first checks whether a filing date can be accorded, then carries out a formalities examination: are the required documents, designations and fees in order?",
+     de:"Eine europäische Patentanmeldung kann online beim EPA oder in vielen Fällen bei einem nationalen Patentamt eingereicht werden. Sie kann in jeder Sprache eingereicht werden, das Verfahren wird aber in einer der drei Amtssprachen des EPA geführt: Deutsch, Englisch oder Französisch. Die Eingangsstelle prüft zunächst, ob ein Anmeldetag zuerkannt werden kann, und führt dann die Formalprüfung durch: Sind die erforderlichen Unterlagen, Benennungen und Gebühren in Ordnung?",
+     fr:"Une demande de brevet européen peut être déposée en ligne auprès de l'OEB ou, dans de nombreux cas, auprès d'un office national. Elle peut être déposée dans n'importe quelle langue, mais la procédure se déroule dans l'une des trois langues officielles de l'OEB : l'allemand, l'anglais ou le français. La section de dépôt vérifie d'abord si une date de dépôt peut être attribuée, puis procède à l'examen des formalités : les pièces, désignations et taxes requises sont-elles en ordre ?"},
+  k:{en:"Key takeaway: the filing date, or an earlier priority date, starts the clock for most later time limits.",de:"Kernaussage: Der Anmeldetag oder ein früherer Prioritätstag startet die Uhr für die meisten späteren Fristen.",fr:"À retenir : la date de dépôt, ou une date de priorité antérieure, fait courir la plupart des délais ultérieurs."}},
+ {when:{en:"~6 months",de:"~6 Monate",fr:"~6 mois"},
+  t:{en:"Search",de:"Recherche",fr:"Recherche"},
+  b:{en:"Every application undergoes a mandatory search. A search examiner identifies the relevant prior art and draws up the European search report, together with a written search opinion: a first, preliminary view on whether the invention meets the requirements for patentability. The EPO aims to issue it within about six months of filing, so applicants can decide early whether to continue.",
+     de:"Für jede Anmeldung wird eine obligatorische Recherche durchgeführt. Ein Rechercheprüfer ermittelt den relevanten Stand der Technik und erstellt den europäischen Recherchenbericht mit einer schriftlichen Stellungnahme: eine erste, vorläufige Einschätzung, ob die Erfindung die Patentierbarkeitsvoraussetzungen erfüllt. Das EPA strebt an, ihn innerhalb von etwa sechs Monaten nach Einreichung zu erstellen, damit Anmelder früh über das weitere Vorgehen entscheiden können.",
+     fr:"Chaque demande fait l'objet d'une recherche obligatoire. Un examinateur identifie l'état de la technique pertinent et établit le rapport de recherche européenne, accompagné d'un avis au stade de la recherche : une première appréciation provisoire de la brevetabilité de l'invention. L'OEB vise à l'émettre dans un délai d'environ six mois à compter du dépôt, afin que le demandeur puisse décider tôt de poursuivre ou non."},
+  k:{en:"Key takeaway: the search opinion is not a decision, but it is the best early signal of where an application stands.",de:"Kernaussage: Die Stellungnahme ist keine Entscheidung, aber das beste frühe Signal, wo eine Anmeldung steht.",fr:"À retenir : l'avis au stade de la recherche n'est pas une décision, mais c'est le meilleur signal précoce sur la situation d'une demande."}},
+ {when:{en:"18 months",de:"18 Monate",fr:"18 mois"},
+  t:{en:"Publication",de:"Veröffentlichung",fr:"Publication"},
+  b:{en:"The application is published 18 months after the filing date or, if priority is claimed, after the earliest priority date. Early publication can be requested. From this point the invention is public and the application appears in patent databases such as Espacenet. The search report is usually published together with the application, or shortly afterwards.",
+     de:"Die Anmeldung wird 18 Monate nach dem Anmeldetag veröffentlicht oder, wenn eine Priorität beansprucht wird, nach dem frühesten Prioritätstag. Eine frühere Veröffentlichung kann beantragt werden. Ab diesem Zeitpunkt ist die Erfindung öffentlich und die Anmeldung erscheint in Patentdatenbanken wie Espacenet. Der Recherchenbericht wird meist zusammen mit der Anmeldung oder kurz danach veröffentlicht.",
+     fr:"La demande est publiée 18 mois après la date de dépôt ou, si une priorité est revendiquée, après la date de priorité la plus ancienne. Une publication anticipée peut être demandée. Dès lors, l'invention est publique et la demande apparaît dans des bases de données comme Espacenet. Le rapport de recherche est généralement publié avec la demande, ou peu après."},
+  k:{en:"Key takeaway: the mention of the search report's publication in the European Patent Bulletin starts a six-month period.",de:"Kernaussage: Der Hinweis auf die Veröffentlichung des Recherchenberichts im Europäischen Patentblatt startet eine Sechsmonatsfrist.",fr:"À retenir : la mention de la publication du rapport de recherche au Bulletin européen des brevets fait courir un délai de six mois."}},
+ {when:{en:"+6 months",de:"+6 Monate",fr:"+6 mois"},
+  t:{en:"Examination",de:"Prüfung",fr:"Examen"},
+  b:{en:"To continue, the applicant files a request for examination and pays the examination fee within six months of the date on which the European Patent Bulletin mentions the publication of the search report. An examining division, normally three examiners, then assesses whether the application meets the requirements of the European Patent Convention. The applicant can reply to objections and amend the claims. When the division is ready to grant, it informs the applicant of the text in which it intends to grant the patent.",
+     de:"Um fortzufahren, stellt der Anmelder innerhalb von sechs Monaten nach dem Tag, an dem im Europäischen Patentblatt auf die Veröffentlichung des Recherchenberichts hingewiesen wird, den Prüfungsantrag und zahlt die Prüfungsgebühr. Eine Prüfungsabteilung, in der Regel drei Prüfer, beurteilt dann, ob die Anmeldung die Erfordernisse des Europäischen Patentübereinkommens erfüllt. Der Anmelder kann auf Einwände erwidern und die Ansprüche ändern. Ist die Abteilung zur Erteilung bereit, teilt sie dem Anmelder die Fassung mit, in der sie das Patent erteilen will.",
+     fr:"Pour poursuivre, le demandeur présente une requête en examen et acquitte la taxe d'examen dans un délai de six mois à compter de la date à laquelle le Bulletin européen des brevets mentionne la publication du rapport de recherche. Une division d'examen, normalement composée de trois examinateurs, vérifie ensuite si la demande satisfait aux exigences de la Convention sur le brevet européen. Le demandeur peut répondre aux objections et modifier les revendications. Lorsque la division est prête à délivrer le brevet, elle notifie au demandeur le texte dans lequel elle envisage de le délivrer."},
+  k:{en:"Key takeaway: to close this stage, the applicant approves the text, pays the grant and publication fees and files translations of the claims into the other two official languages.",de:"Kernaussage: Zum Abschluss billigt der Anmelder die Fassung, zahlt die Erteilungs- und Veröffentlichungsgebühr und reicht Übersetzungen der Ansprüche in die beiden anderen Amtssprachen ein.",fr:"À retenir : pour clore cette étape, le demandeur approuve le texte, acquitte les taxes de délivrance et de publication et produit une traduction des revendications dans les deux autres langues officielles."}},
+ {when:{en:"~2–5 years",de:"~2–5 Jahre",fr:"~2 à 5 ans"},
+  t:{en:"Grant & validation",de:"Erteilung & Validierung",fr:"Délivrance et validation"},
+  b:{en:"The decision to grant takes effect on the date its mention is published in the European Patent Bulletin. The European patent then becomes a bundle of national patents in the states where it is validated. Since 1 June 2023, the proprietor can also request unitary effect, a Unitary Patent covering the participating EU member states, no later than one month after the mention of the grant.",
+     de:"Die Entscheidung über die Erteilung wird an dem Tag wirksam, an dem im Europäischen Patentblatt auf die Erteilung hingewiesen wird. Das europäische Patent wird dann zu einem Bündel nationaler Patente in den Staaten, in denen es validiert wird. Seit dem 1. Juni 2023 kann der Inhaber außerdem spätestens einen Monat nach dem Hinweis auf die Erteilung die einheitliche Wirkung beantragen: ein Einheitspatent für die teilnehmenden EU-Mitgliedstaaten.",
+     fr:"La décision de délivrance prend effet à la date à laquelle sa mention est publiée au Bulletin européen des brevets. Le brevet européen devient alors un faisceau de brevets nationaux dans les États où il est validé. Depuis le 1er juin 2023, le titulaire peut aussi demander l'effet unitaire, un brevet unitaire couvrant les États membres participants de l'UE, au plus tard un mois après la mention de la délivrance."},
+  k:{en:"Key takeaway: the whole grant procedure typically takes about two to five years from filing.",de:"Kernaussage: Das gesamte Erteilungsverfahren dauert ab Einreichung typischerweise etwa zwei bis fünf Jahre.",fr:"À retenir : la procédure de délivrance dure généralement de deux à cinq ans à compter du dépôt."}},
+ {when:{en:"+9 months",de:"+9 Monate",fr:"+9 mois"},
+  t:{en:"Opposition",de:"Einspruch",fr:"Opposition"},
+  b:{en:"Within nine months of the publication of the mention of grant, any person except the proprietor can file a notice of opposition with the EPO and pay the opposition fee. This single, central procedure can challenge the patent for all states at once. The grounds are limited (Art. 100 EPC): the subject-matter is not patentable, the invention is not disclosed clearly and completely enough, or the patent extends beyond the content of the application as filed. An opposition division of three examiners decides to revoke the patent, maintain it, or maintain it in amended form.",
+     de:"Innerhalb von neun Monaten nach der Veröffentlichung des Hinweises auf die Erteilung kann jede Person außer dem Patentinhaber beim EPA Einspruch einlegen und die Einspruchsgebühr zahlen. In diesem zentralen Verfahren kann das Patent für alle Staaten gleichzeitig angegriffen werden. Die Gründe sind begrenzt (Art. 100 EPÜ): Der Gegenstand ist nicht patentfähig, die Erfindung ist nicht deutlich und vollständig genug offenbart, oder das Patent geht über den Inhalt der ursprünglich eingereichten Anmeldung hinaus. Eine Einspruchsabteilung aus drei Prüfern widerruft das Patent, hält es aufrecht oder hält es in geänderter Fassung aufrecht.",
+     fr:"Dans un délai de neuf mois à compter de la publication de la mention de la délivrance, toute personne, à l'exception du titulaire, peut former opposition auprès de l'OEB et acquitter la taxe d'opposition. Cette procédure centralisée permet de contester le brevet pour tous les États à la fois. Les motifs sont limités (art. 100 CBE) : l'objet n'est pas brevetable, l'invention n'est pas exposée de façon suffisamment claire et complète, ou le brevet s'étend au-delà du contenu de la demande telle que déposée. Une division d'opposition de trois examinateurs révoque le brevet, le maintient ou le maintient sous une forme modifiée."},
+  k:{en:"Key takeaway: the nine-month opposition period cannot be extended.",de:"Kernaussage: Die neunmonatige Einspruchsfrist ist nicht verlängerbar.",fr:"À retenir : le délai d'opposition de neuf mois ne peut pas être prolongé."}}
+];
+
+const SCENARIO = {en:"Lena runs a small sensor start-up. On 1 March 2025 she filed a national patent application, and later a European application claiming priority from it. Help her get her deadlines right.",
+  de:"Lena leitet ein kleines Sensor-Start-up. Am 1. März 2025 hat sie eine nationale Patentanmeldung eingereicht und später eine europäische Anmeldung, die deren Priorität beansprucht. Hilf ihr, ihre Fristen richtig einzuschätzen.",
+  fr:"Lena dirige une petite start-up de capteurs. Le 1er mars 2025, elle a déposé une demande de brevet nationale, puis une demande européenne revendiquant sa priorité. Aidez-la à respecter ses délais."};
+
+const QUIZ = [
+ {q:{en:"When will her European application normally be published?",de:"Wann wird ihre europäische Anmeldung normalerweise veröffentlicht?",fr:"Quand sa demande européenne sera-t-elle normalement publiée ?"},
+  o:{en:["Around March 2026 (12 months)","Around September 2026 (18 months from the priority date)","Only after the patent is granted"],de:["Etwa im März 2026 (12 Monate)","Etwa im September 2026 (18 Monate ab Prioritätstag)","Erst nach der Erteilung"],fr:["Vers mars 2026 (12 mois)","Vers septembre 2026 (18 mois après la date de priorité)","Seulement après la délivrance"]},
+  a:1, w:{en:"Publication follows 18 months from the earliest priority date: 1 March 2025 + 18 months.",de:"Die Veröffentlichung erfolgt 18 Monate nach dem frühesten Prioritätstag: 1. März 2025 + 18 Monate.",fr:"La publication intervient 18 mois après la date de priorité la plus ancienne : 1er mars 2025 + 18 mois."}},
+ {q:{en:"The Bulletin mentions the publication of her search report on 10 June 2026. By when must she request examination?",de:"Das Patentblatt weist am 10. Juni 2026 auf die Veröffentlichung ihres Recherchenberichts hin. Bis wann muss sie den Prüfungsantrag stellen?",fr:"Le Bulletin mentionne la publication de son rapport de recherche le 10 juin 2026. Avant quelle date doit-elle présenter la requête en examen ?"},
+  o:{en:["10 July 2026","10 December 2026","10 March 2027"],de:["10. Juli 2026","10. Dezember 2026","10. März 2027"],fr:["10 juillet 2026","10 décembre 2026","10 mars 2027"]},
+  a:1, w:{en:"The request for examination is due within six months of the mention of the search report's publication.",de:"Der Prüfungsantrag ist innerhalb von sechs Monaten nach dem Hinweis auf die Veröffentlichung des Recherchenberichts zu stellen.",fr:"La requête en examen doit être présentée dans les six mois suivant la mention de la publication du rapport de recherche."}},
+ {q:{en:"Which document gives Lena an early, preliminary view on patentability?",de:"Welches Dokument gibt Lena eine frühe, vorläufige Einschätzung zur Patentierbarkeit?",fr:"Quel document donne à Lena une première appréciation provisoire de la brevetabilité ?"},
+  o:{en:["The written search opinion","The decision to grant","A notice of opposition"],de:["Die schriftliche Stellungnahme zur Recherche","Die Entscheidung über die Erteilung","Eine Einspruchsschrift"],fr:["L'avis au stade de la recherche","La décision de délivrance","Un acte d'opposition"]},
+  a:0, w:{en:"The search opinion accompanies the search report and gives a first view on patentability.",de:"Die Stellungnahme begleitet den Recherchenbericht und gibt eine erste Einschätzung zur Patentierbarkeit.",fr:"L'avis accompagne le rapport de recherche et donne une première appréciation de la brevetabilité."}},
+ {q:{en:"Her patent is granted and she wants a Unitary Patent. What is the deadline?",de:"Ihr Patent wird erteilt und sie möchte ein Einheitspatent. Welche Frist gilt?",fr:"Son brevet est délivré et elle souhaite un brevet unitaire. Quel est le délai ?"},
+  o:{en:["One month after the mention of the grant","Six months after the grant","Any time during the life of the patent"],de:["Ein Monat nach dem Hinweis auf die Erteilung","Sechs Monate nach der Erteilung","Jederzeit während der Laufzeit des Patents"],fr:["Un mois après la mention de la délivrance","Six mois après la délivrance","À tout moment pendant la durée du brevet"]},
+  a:0, w:{en:"The request for unitary effect must be filed no later than one month after the mention of the grant.",de:"Der Antrag auf einheitliche Wirkung ist spätestens einen Monat nach dem Hinweis auf die Erteilung zu stellen.",fr:"La demande d'effet unitaire doit être présentée au plus tard un mois après la mention de la délivrance."}},
+ {q:{en:"A competitor wants to challenge Lena's patent centrally at the EPO. What applies?",de:"Ein Wettbewerber möchte Lenas Patent zentral beim EPA angreifen. Was gilt?",fr:"Un concurrent veut contester le brevet de Lena de manière centralisée devant l'OEB. Que s'applique-t-il ?"},
+  o:{en:["Opposition within nine months of the mention of grant","Opposition at any time during the patent's 20-year term","This is only possible before national courts"],de:["Einspruch innerhalb von neun Monaten nach dem Hinweis auf die Erteilung","Einspruch jederzeit während der 20-jährigen Laufzeit","Das ist nur vor nationalen Gerichten möglich"],fr:["Opposition dans les neuf mois suivant la mention de la délivrance","Opposition à tout moment pendant les 20 ans du brevet","Ce n'est possible que devant les juridictions nationales"]},
+  a:0, w:{en:"Opposition is a central EPO procedure, open for nine months after the mention of grant.",de:"Der Einspruch ist ein zentrales EPA-Verfahren, das neun Monate nach dem Hinweis auf die Erteilung offensteht.",fr:"L'opposition est une procédure centralisée de l'OEB, ouverte pendant neuf mois après la mention de la délivrance."}},
+ {q:{en:"Who cannot file an opposition against Lena's patent?",de:"Wer kann keinen Einspruch gegen Lenas Patent einlegen?",fr:"Qui ne peut pas former opposition contre le brevet de Lena ?"},
+  o:{en:["A competitor","Lena herself, as the proprietor","A university research group"],de:["Ein Wettbewerber","Lena selbst als Patentinhaberin","Eine universitäre Forschungsgruppe"],fr:["Un concurrent","Lena elle-même, en tant que titulaire","Un groupe de recherche universitaire"]},
+  a:1, w:{en:"Any person may oppose, except the proprietor, who can instead request limitation or revocation.",de:"Jede Person kann Einspruch einlegen, außer dem Inhaber; dieser kann stattdessen Beschränkung oder Widerruf beantragen.",fr:"Toute personne peut former opposition, sauf le titulaire, qui peut en revanche demander la limitation ou la révocation."}}
+];
+
+const SRC = {
+  basics:{t:"EPO – Applying for a patent: the basics",u:"https://epo.org/applying/basics.html"},
+  howto:{t:"EPO – How to apply for a patent",u:"https://www.epo.org/en/new-to-patents/how-to-apply-for-a-patent"},
+  guide:{t:"European Patent Guide, 5.4.1 Request for examination",u:"https://www.epo.org/en/legal/guide-epc/2024/ga_c5_4_1.html"},
+  a99:{t:"European Patent Convention, Art. 99 (Opposition)",u:"https://www.epo.org/en/legal/epc/2020/a99.html"},
+  guidelines:{t:"Guidelines for Examination, General Part",u:"https://epo.org/en/legal/guidelines-epc/2024/foreword_5.html"},
+  oppo:{t:"EPO – Oppositions",u:"https://epo.org/en/applying/european/oppositions"}
+};
+
+const KB = [
+ {kw:["publish","publication","published","18","veröffentlich","publié","publication","publiée"],src:"basics",
+  a:{en:"An application is published 18 months after the filing date or, if priority is claimed, after the earliest priority date. You can request earlier publication.",de:"Eine Anmeldung wird 18 Monate nach dem Anmeldetag veröffentlicht oder, wenn eine Priorität beansprucht wird, nach dem frühesten Prioritätstag. Eine frühere Veröffentlichung kann beantragt werden.",fr:"Une demande est publiée 18 mois après la date de dépôt ou, si une priorité est revendiquée, après la date de priorité la plus ancienne. Une publication anticipée peut être demandée."}},
+ {kw:["examination","request","examine","prüfung","prüfungsantrag","examen","requête"],src:"guide",
+  a:{en:"File the request for examination, and pay the examination fee, within six months of the date on which the European Patent Bulletin mentions the publication of the European search report.",de:"Der Prüfungsantrag ist innerhalb von sechs Monaten nach dem Tag zu stellen, an dem im Europäischen Patentblatt auf die Veröffentlichung des europäischen Recherchenberichts hingewiesen wird; die Prüfungsgebühr ist in derselben Frist zu zahlen.",fr:"La requête en examen doit être présentée, et la taxe d'examen acquittée, dans un délai de six mois à compter de la date à laquelle le Bulletin européen des brevets mentionne la publication du rapport de recherche européenne."}},
+ {kw:["oppos","einspruch","challenge","angreifen","contester"],src:"a99",
+  a:{en:"Within nine months of the publication of the mention of grant in the European Patent Bulletin, any person except the proprietor may give notice of opposition to the EPO and pay the opposition fee.",de:"Innerhalb von neun Monaten nach der Veröffentlichung des Hinweises auf die Erteilung im Europäischen Patentblatt kann jede Person außer dem Inhaber beim EPA Einspruch einlegen und die Einspruchsgebühr zahlen.",fr:"Dans un délai de neuf mois à compter de la publication de la mention de la délivrance au Bulletin européen des brevets, toute personne, sauf le titulaire, peut former opposition auprès de l'OEB et acquitter la taxe d'opposition."}},
+ {kw:["unitary","unitar","einheit","unitaire"],src:"guidelines",
+  a:{en:"The proprietor may file a request for unitary effect no later than one month after the date of publication of the mention of the grant in the European Patent Bulletin.",de:"Der Inhaber kann spätestens einen Monat nach dem Tag der Veröffentlichung des Hinweises auf die Erteilung im Europäischen Patentblatt die einheitliche Wirkung beantragen.",fr:"Le titulaire peut demander l'effet unitaire au plus tard un mois après la date de publication de la mention de la délivrance au Bulletin européen des brevets."}},
+ {kw:["how long","long","duration","years","take","dauer","dauert","lange","jahre","durée","combien","temps","dure"],src:"howto",
+  a:{en:"The European patent grant procedure takes about two to five years from filing.",de:"Das europäische Patenterteilungsverfahren dauert ab Einreichung etwa zwei bis fünf Jahre.",fr:"La procédure de délivrance du brevet européen dure environ deux à cinq ans à compter du dépôt."}},
+ {kw:["search","report","opinion","recherche","recherchenbericht","rapport","avis"],src:"basics",
+  a:{en:"You receive the search report, with a preliminary opinion on patentability, typically within about six months of filing. It helps you decide whether to proceed with your application.",de:"Den Recherchenbericht mit einer vorläufigen Stellungnahme zur Patentierbarkeit erhältst du in der Regel innerhalb von etwa sechs Monaten nach Einreichung. Er hilft dir zu entscheiden, ob du die Anmeldung weiterverfolgst.",fr:"Vous recevez le rapport de recherche, avec un avis provisoire sur la brevetabilité, généralement dans un délai d'environ six mois après le dépôt. Il vous aide à décider de poursuivre ou non votre demande."}}
+];
+
+const DATA = {
+  funnel:[["L1",100],["L2",91],["L3",86],["L4",64],["L5",59],["L6",55]],
+  questions:[["Q1",82],["Q2",47],["Q3",74],["Q4",58],["Q5",88],["Q6",91]],
+  regions:{en:["Europe","Asia","Americas","Africa","Oceania"],de:["Europa","Asien","Amerika","Afrika","Ozeanien"],fr:["Europe","Asie","Amériques","Afrique","Océanie"]},
+  regionVals:[58,21,13,5,3]
+};
+
+/* ---------- state ---------- */
+const KEY="patent-learning-lab-v1";
+let S={lang:"en",done:{},best:null,name:"",path:"epo",interest:{}};
+try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
+const T=()=>UI[S.lang]; const L=o=>o[S.lang]; const P=()=>PX[S.lang];
+const curPath=()=>PATHWAYS.find(p=>p.id===S.path)||PATHWAYS[0];
+const pathPill=()=>{const p=curPath();return `<div class="pathpill"><span class="ob">${L(p.office)}</span><span>${P().pathLbl}: <b>${L(p.name)}</b></span><a href="#home" data-tohome="1">${P().change}</a></div>`;};
+let view={page:"home",lesson:null}; let chat=[];
+const doneCount=()=>LESSONS.filter((_,i)=>S.done[i]).length;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- shell ---------- */
+function shell(){
+  const t=T(); document.documentElement.lang=S.lang;
+  document.getElementById("skip").textContent=t.skip;
+  document.getElementById("nav").innerHTML=Object.entries(t.nav).map(([k,v])=>`<a href="#${k}" ${view.page===k?'aria-current="page"':''}>${v}</a>`).join("");
+  document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===S.lang));
+  document.getElementById("foot").textContent=t.foot;
+}
+function render(){shell(); ({home,course,tutor,insights,about})[view.page]();}
+const app=document.getElementById("app");
+
+/* ---------- home ---------- */
+function home(){
+  const t=T(), started=doneCount()>0;
+  app.innerHTML=`<section class="hero">
+    <div><div class="eyebrow">${t.heroEy}</div><h1>${t.heroT}</h1><p>${t.heroP}</p>
+      <a class="btn" href="#pathways" data-scroll="pathways">${started?t.cont:t.start} →</a></div>
+    <div class="tiles">
+      <a class="tile" href="#course"><span class="ico" aria-hidden="true">🧭</span><b>${t.t1}</b><span>${t.t1s}</span></a>
+      <a class="tile" href="#course" data-goquiz="1"><span class="ico" aria-hidden="true">🧩</span><b>${t.t2}</b><span>${t.t2s}</span></a>
+      <a class="tile" href="#tutor"><span class="ico" aria-hidden="true">💬</span><b>${t.t3}</b><span>${t.t3s}</span></a>
+      <a class="tile" href="#insights"><span class="ico" aria-hidden="true">📊</span><b>${t.t4}</b><span>${t.t4s}</span></a>
+    </div></section>
+    <section id="pathways" style="margin-bottom:24px"><div class="eyebrow">${P().chooseEy}</div><h2>${P().chooseH}</h2>
+      <p class="muted" style="max-width:70ch;margin-top:0">${P().chooseP}</p>
+      <div class="paths">${PATHWAYS.map(pathCard).join("")}</div>
+      <p class="small muted" style="margin-top:10px">${P().interestNote}</p></section>
+    <section class="card pad"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px"><div class="eyebrow">${t.yourProg}</div>${pathPill()}</div>${timeline()}</section>`;
+}
+function pathCard(p){
+  const x=P(), sel=p.avail&&S.path===p.id, int=!!S.interest[p.id];
+  return `<div class="path card ${p.avail?'':'soon'} ${sel?'sel':''}">
+    <div class="path-top"><span class="ob">${L(p.office)}</span><span class="badge ${p.avail?'ok':''}">${p.avail?x.avail:x.soon}</span></div>
+    <b>${L(p.name)}</b><span class="small muted">${p.desc?L(p.desc):x.soonDesc}</span>
+    ${p.avail?`<a class="btn ${sel?'':'ghost'}" href="#course" data-path="${p.id}">${sel?'✓ '+x.selected:x.startPath}</a>`
+      :`<button class="btn quiet" data-interest="${p.id}" aria-pressed="${int}">${int?x.noted:x.notify}</button>`}</div>`;
+}
+function timeline(){
+  return `<div class="tl-wrap"><div class="timeline" role="list">${LESSONS.map((l,i)=>{
+    const cls=S.done[i]?"done":(view.page==="course"&&view.lesson===i?"cur":"");
+    return `<button class="step ${cls}" role="listitem" data-open="${i}" aria-label="${esc(L(l.t))}${S.done[i]?' ✓':''}"><span class="node">${S.done[i]?'✓':i+1}</span><span class="lbl">${L(l.t)}</span><span class="when">${L(l.when)}</span></button>`;}).join("")}</div></div>`;
+}
+
+/* ---------- course ---------- */
+function course(){
+  const t=T();
+  if(view.lesson===null){ const f=LESSONS.findIndex((_,i)=>!S.done[i]); view.lesson=f<0?"quiz":f; }
+  const pct=Math.round(doneCount()/LESSONS.length*100);
+  let body="";
+  if(view.lesson==="quiz") body=quizView();
+  else if(view.lesson==="cert") body=certView();
+  else{
+    const i=view.lesson,l=LESSONS[i],last=i===LESSONS.length-1;
+    body=`<div class="lesson"><div class="eyebrow">${t.lessonOf(i+1,LESSONS.length)} · ${L(l.when)}</div>
+      <h2>${L(l.t)}</h2><p>${L(l.b)}</p><div class="callout">${L(l.k)}</div>
+      <div class="nav-row"><button class="btn quiet" data-open="${i-1}" ${i===0?'disabled':''}>${t.prev}</button>
+      <button class="btn" data-complete="${i}">${last?t.toQuiz:(S.done[i]?t.next:t.markNext)}</button></div></div>`;
+  }
+  app.innerHTML=`<section class="card pad">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">${pathPill()}<div class="eyebrow">${t.yourProg} · ${pct}%</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ${view.lesson==='quiz'?'':'ghost'}" data-open="quiz">🧩 ${t.quizTab}</button>
+        ${S.best!==null&&S.best>=.7&&doneCount()===6?`<button class="btn ${view.lesson==='cert'?'':'ghost'}" data-open="cert">★ ${t.certTab}</button>`:""}
+      </div></div>
+    <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>
+    <div style="margin-top:16px">${timeline()}</div>${body}</section>`;
+  if(view.lesson==="quiz") bindQuiz();
+}
+
+let picks={};
+function quizView(){
+  const t=T();
+  return `<div class="lesson"><div class="eyebrow">${t.quizEy}</div><h2>${t.quizT}</h2>
+    <div class="scenario"><span style="font-size:1.6rem" aria-hidden="true">👩‍🔬</span><div>${L(SCENARIO)}</div></div>
+    <div id="quiz">${QUIZ.map((q,qi)=>`<fieldset class="q"><legend>${qi+1}. ${L(q.q)}</legend>
+      ${L(q.o).map((o,oi)=>`<button class="opt" data-q="${qi}" data-o="${oi}" aria-pressed="false">${o}</button>`).join("")}
+      <div class="fb" id="fb${qi}" aria-live="polite"></div></fieldset>`).join("")}</div>
+    <button class="btn" id="submitQuiz">${t.submit}</button><div id="qres" aria-live="polite"></div></div>`;
+}
+function bindQuiz(){
+  picks={}; const qz=document.getElementById("quiz"),t=T();
+  qz.addEventListener("click",e=>{const b=e.target.closest(".opt"); if(!b||qz.dataset.locked) return;
+    qz.querySelectorAll(`.opt[data-q="${b.dataset.q}"]`).forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true"); picks[b.dataset.q]=+b.dataset.o;});
+  document.getElementById("submitQuiz").addEventListener("click",()=>{
+    const res=document.getElementById("qres");
+    if(Object.keys(picks).length<QUIZ.length){res.innerHTML=`<div class="result fail">${t.answerAll(QUIZ.length)}</div>`;return;}
+    qz.dataset.locked=1; let r=0;
+    QUIZ.forEach((q,qi)=>{const ok=picks[qi]===q.a; if(ok) r++;
+      qz.querySelector(`.opt[data-q="${qi}"][data-o="${q.a}"]`).classList.add("right");
+      if(!ok) qz.querySelector(`.opt[data-q="${qi}"][data-o="${picks[qi]}"]`).classList.add("wrong");
+      document.getElementById("fb"+qi).textContent=(ok?"✓ "+t.correct:"✗ "+t.notQuite)+" "+L(q.w);});
+    const sc=r/QUIZ.length,pass=sc>=.7; S.best=Math.max(S.best||0,sc); save();
+    const all=doneCount()===LESSONS.length;
+    res.innerHTML=`<div class="result ${pass?'pass':'fail'}"><b>${t.score(r,QUIZ.length,Math.round(sc*100))}</b> ${pass?t.passed:t.failed}
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      ${pass&&all?`<button class="btn" data-open="cert">${t.getCert}</button>`:""}
+      ${pass&&!all?`<span class="small muted">${t.finishLessons}</span>`:""}
+      <button class="btn ghost" data-open="quiz">${t.retake}</button></div></div>`;
+    document.getElementById("submitQuiz").disabled=true;
+  });
+}
+function certView(){
+  const t=T(),loc={en:"en-GB",de:"de-DE",fr:"fr-FR"}[S.lang];
+  const d=new Date().toLocaleDateString(loc,{day:"numeric",month:"long",year:"numeric"});
+  return `<div class="lesson"><h2>${t.certTab}</h2><label class="muted small" for="cn">${t.certHint}</label><br>
+    <input type="text" id="cn" placeholder="${t.yourName}" value="${esc(S.name)}" style="margin-top:6px">
+    <div class="cert"><div class="eyebrow">${t.certEy}</div><h2>${L({en:"The European patent grant procedure",de:"Das europäische Patenterteilungsverfahren",fr:"La procédure de délivrance du brevet européen"})}</h2>
+    <div>${t.certFor}</div><div class="name" id="cno">${esc(S.name||t.yourName)}</div>
+    <div>${t.certDid(Math.round((S.best||0)*100))}</div><p class="muted small" style="margin-top:16px">Patent Learning Lab · ${d}</p></div></div>`;
+}
+
+/* ---------- tutor ---------- */
+function answer(q){
+  const s=q.toLowerCase(); let best=null,score=0;
+  KB.forEach(k=>{const n=k.kw.filter(w=>s.includes(w)).length; if(n>score){score=n;best=k;}});
+  return best?{text:L(best.a),src:SRC[best.src]}:{text:T().fallback,src:null};
+}
+function tutor(){
+  const t=T();
+  if(!chat.length) chat=[{bot:true,hello:true}];
+  app.innerHTML=`<section class="card pad"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><div class="eyebrow">${t.tutorEy}</div>${pathPill()}</div><h2>${t.tutorT}</h2>
+    <p class="muted" style="max-width:70ch">${t.tutorP}</p>
+    <div class="chat" id="chat" aria-live="polite"></div>
+    <div class="chips">${t.chips.map(c=>`<button class="chip" data-ask="${esc(c)}">${c}</button>`).join("")}</div>
+    <form class="ask" id="askf"><input type="text" id="askq" placeholder="${esc(t.askPh)}" aria-label="${esc(t.askPh)}"><button class="btn" type="submit">${t.send}</button></form>
+    <div class="notice">${t.tutorNote}</div></section>`;
+  drawChat();
+  document.getElementById("askf").addEventListener("submit",e=>{e.preventDefault();const i=document.getElementById("askq");if(i.value.trim()){ask(i.value.trim());i.value="";}});
+}
+function ask(q){ chat.push({me:q}); chat.push({bot:true,...answer(q)}); drawChat(); }
+function drawChat(){
+  const c=document.getElementById("chat"); if(!c) return; const t=T();
+  c.innerHTML=chat.map(m=>m.me?`<div class="msg me">${esc(m.me)}</div>`:
+    `<div class="msg bot">${m.hello?t.hello:esc(m.text)}${m.src?`<span class="cite">📎 ${t.srcLbl}: <a href="${m.src.u}" target="_blank" rel="noopener">${m.src.t}</a></span>`:""}</div>`).join("");
+  c.scrollTop=c.scrollHeight;
+}
+
+/* ---------- insights ---------- */
+function bars(id,rows,hiIdx,unit){
+  return `<div class="bars" id="${id}" role="img" aria-label="${esc(rows.map(r=>r[0]+": "+r[1]+unit).join(", "))}">${rows.map((r,i)=>
+    `<div class="bar-row" data-tip="${esc(r[2]||r[0])}: ${r[1]}${unit}"><span class="bl">${esc(r[0])}</span>
+      <div class="track"><div class="fill ${i===hiIdx?'hi':''}" style="width:${r[1]}%"></div></div><span class="bv">${r[1]}${unit}</span></div>`).join("")}</div>`;
+}
+function table(rows,unit){const t=T();return `<table class="data"><thead><tr><th>${t.colItem}</th><th>${t.colVal}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r[2]||r[0])}</td><td>${r[1]}${unit}</td></tr>`).join("")}</tbody></table>`;}
+function chartCard(key,title,sub,rows,hi){
+  const t=T();
+  return `<div class="card chart-card"><div class="chart-head"><div><h3>${title}</h3><div class="small muted">${sub}</div></div>
+    <button class="linkbtn" data-toggle="${key}">${t.showTable}</button></div>
+    <div data-chart="${key}">${bars("b-"+key,rows,hi,"%")}</div><div data-table="${key}" hidden>${table(rows,"%")}</div></div>`;
+}
+function insights(){
+  const t=T();
+  const funnel=DATA.funnel.map((r,i)=>[r[0],r[1],L(LESSONS[i].t)]);
+  const qs=DATA.questions.map((r,i)=>[r[0],r[1],r[0]+" · "+L(QUIZ[i].q)]);
+  const reg=DATA.regionVals.map((v,i)=>[L(DATA.regions)[i],v]);
+  const best=S.best===null?"–":Math.round(S.best*100)+"%";
+  app.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><div class="eyebrow">${t.insEy}</div>${pathPill()}</div>
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap"><h1 style="margin:0">${t.insT}</h1><span class="sample">⚠ ${t.sampleLbl}</span></div>
+    <div class="kpis">
+      <div class="card kpi"><b>${(2480).toLocaleString(S.lang)}</b><span>${t.kLearners}</span></div>
+      <div class="card kpi"><b>55${S.lang==="en"?"":" "}%</b><span>${t.kComp}</span></div>
+      <div class="card kpi"><b>${(4.4).toLocaleString(S.lang)}</b><span>${t.kRating}</span></div>
+      <div class="card kpi"><b>14 min</b><span>${t.kTime}</span></div></div>
+    <div class="charts">${chartCard("f",t.c1,t.c1s,funnel,3)}${chartCard("q",t.c2,t.c2s,qs,1)}${chartCard("r",t.c3,t.c3s,reg,-1)}</div>
+    <h3 style="margin-top:26px">${t.insH}</h3>
+    <div class="insights">${t.ins.map(x=>`<div class="card ins"><div class="k">${x[0]}</div><div class="a">${x[1]}</div></div>`).join("")}</div>
+    <div class="card pad" style="margin-top:14px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+      <div><div class="eyebrow">● ${t.yourSess}</div><div>${t.yourSessP(doneCount(),best)}</div></div>
+      <button class="btn quiet" id="reset">${t.reset}</button></div>`;
+  const r=document.getElementById("reset");let armed=false;
+  r.addEventListener("click",()=>{if(!armed){armed=true;r.textContent=t.resetConfirm;return;} S.done={};S.best=null;save();render();});
+}
+
+/* ---------- about ---------- */
+function about(){
+  const t=T();
+  app.innerHTML=`<section class="card pad"><div class="eyebrow">${t.aboutEy}</div><h1>${t.aboutT}</h1><p class="muted" style="max-width:72ch">${t.aboutP}</p>
+    <table class="map"><thead><tr><th>${t.mapH[0]}</th><th>${t.mapH[1]}</th></tr></thead><tbody>${t.map.map(m=>`<tr><td><b>${m[0]}</b></td><td>${m[1]}</td></tr>`).join("")}</tbody></table></section>
+    <section class="card pad" style="margin-top:16px"><h2>${t.pipeH}</h2>
+    <div class="pipe">${t.pipe.map(p=>`<div class="${p[2]?'human':''}"><b>${p[0]}</b>${p[1]}</div>`).join("")}</div>
+    <p class="small muted" style="max-width:72ch">${t.pipeNote}</p></section>
+    <section class="card pad" style="margin-top:16px"><h3>${t.srcH}</h3><ul>${Object.values(SRC).map(s=>`<li><a href="${s.u}" target="_blank" rel="noopener">${s.t}</a></li>`).join("")}</ul></section>`;
+}
+
+/* ---------- events ---------- */
+const tip=document.getElementById("tip");
+document.addEventListener("mousemove",e=>{const r=e.target.closest&&e.target.closest("[data-tip]");
+  if(r){tip.textContent=r.dataset.tip;tip.style.opacity=1;tip.style.left=Math.min(e.clientX+14,innerWidth-250)+"px";tip.style.top=(e.clientY+14)+"px";} else tip.style.opacity=0;});
+document.addEventListener("click",e=>{
+  const lg=e.target.closest("[data-lang]"); if(lg){S.lang=lg.dataset.lang;save();render();return;}
+  const pa=e.target.closest("[data-path]"); if(pa){S.path=pa.dataset.path;save();}
+  const it=e.target.closest("[data-interest]"); if(it){const id=it.dataset.interest;S.interest[id]=!S.interest[id];save();
+    it.setAttribute("aria-pressed",S.interest[id]);it.textContent=S.interest[id]?P().noted:P().notify;return;}
+  const sc=e.target.closest("[data-scroll]"); if(sc){e.preventDefault();document.getElementById(sc.dataset.scroll).scrollIntoView({behavior:"smooth"});return;}
+  const th=e.target.closest("[data-tohome]"); if(th&&view.page==="home"){e.preventDefault();document.getElementById("pathways").scrollIntoView({behavior:"smooth"});return;}
+  if(th){e.preventDefault();location.hash="home";setTimeout(()=>{const el=document.getElementById("pathways");if(el)el.scrollIntoView();},60);return;}
+  const gq=e.target.closest("[data-goquiz]"); if(gq){view.lesson="quiz";}
+  const cp=e.target.closest("[data-complete]"); if(cp){const i=+cp.dataset.complete;S.done[i]=true;save();view.lesson=i<LESSONS.length-1?i+1:"quiz";render();scrollTo(0,0);return;}
+  const op=e.target.closest("[data-open]"); if(op){const v=op.dataset.open;if(v==="")return;view.lesson=(v==="quiz"||v==="cert")?v:+v;
+    if(view.page!=="course"){location.hash="course";} else {render();} scrollTo(0,0);return;}
+  const ak=e.target.closest("[data-ask]"); if(ak){ask(ak.dataset.ask);return;}
+  const tg=e.target.closest("[data-toggle]"); if(tg){const k=tg.dataset.toggle,c=document.querySelector(`[data-chart="${k}"]`),tb=document.querySelector(`[data-table="${k}"]`);
+    const show=tb.hidden; tb.hidden=!show; c.hidden=show; tg.textContent=show?T().showChart:T().showTable;}
+});
+document.addEventListener("input",e=>{if(e.target.id==="cn"){S.name=e.target.value;save();document.getElementById("cno").textContent=S.name||T().yourName;}});
+function route(){const h=location.hash.slice(1);const pages=["home","course","tutor","insights","about"];
+  const p=pages.includes(h)?h:"home"; if(p!=="course"&&view.page==="course"&&p!==view.page){} view.page=p; render(); }
+addEventListener("hashchange",()=>{route();scrollTo(0,0);});
+route();
+</script>
+</body>
+</html>
