@@ -6,22 +6,46 @@ function home(){
       <a class="btn" href="#pathways" data-scroll="pathways">${started?t.cont:t.start}</a></div>
     <div class="tiles">
       <a class="tile" href="#course"><span class="ico">${ic("book")}</span><b>${t.t1}</b><span>${t.t1s}</span></a>
-      <a class="tile" href="#course" data-goquiz="1"><span class="ico">${ic("quiz")}</span><b>${t.t2}</b><span>${t.t2s}</span></a>
+      <a class="tile" href="#course/quiz"><span class="ico">${ic("quiz")}</span><b>${t.t2}</b><span>${t.t2s}</span></a>
       <a class="tile" href="#tutor"><span class="ico">${ic("chat")}</span><b>${t.t3}</b><span>${t.t3s}</span></a>
-      <a class="tile" href="#progress" data-scroll="progress"><span class="ico">${ic("chart")}</span><b>${R().t4}</b><span>${R().t4s}</span></a>
+      <a class="tile" href="#course"><span class="ico">${ic("chart")}</span><b>${R().t4}</b><span>${R().t4s}</span></a>
     </div></section>
     <section id="pathways" style="margin-bottom:24px"><div class="eyebrow">${P().chooseEy}</div><h2>${P().chooseH}</h2>
       <p class="muted" style="max-width:70ch;margin-top:0">${P().chooseP}</p>
       <div class="paths">${PATHWAYS.map(pathCard).join("")}</div>
-      <p class="small muted" style="margin-top:10px">${P().interestNote}</p></section>
-    <section class="card pad" id="progress" aria-labelledby="prog-h"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px"><h2 class="eyebrow" id="prog-h" style="margin:0">${t.yourProg}</h2>${pathPill()}</div>
-      ${pathReady(curPath())?timeline()+myProgress():`<p class="muted">${pathAvail(curPath())?R().prepH(L(curPath().name)):R().offH(L(curPath().name))}</p>`}</section>`;
+      <p class="small muted" style="margin-top:10px">${P().interestNote}</p></section>`;
+}
+/* ---------- completion of the selected course (the learner's own data only) ---------- */
+const lessonPct=()=>Math.round(doneCount()/LESSONS.length*100);
+const certOk=()=>S.best!==null&&S.best>=.7&&doneCount()===LESSONS.length;
+const courseStatus=()=>certOk()?"done":(doneCount()>0||S.best!==null?"prog":"none");
+function completion(){
+  const x=R(), st=courseStatus(), p=lessonPct();
+  return `<div class="completion"><div class="comp-row"><b>${x.mcPct(p)}</b><span class="badge ${st==="done"?"ok":st==="prog"?"prog":""}">${st==="done"?ic("check"):""}${x.mcStatus[st]}</span></div>
+    <div class="progress" aria-hidden="true"><i style="width:${p}%"></i></div>
+    <div class="small muted">${x.mcLessons(doneCount(),LESSONS.length)}</div></div>`;
+}
+
+/* ---------- My courses: the selected course, its completion and the learner's own progress ---------- */
+function myCourses(){
+  const t=T(),x=R(),st=courseStatus(),next=LESSONS.findIndex((_,i)=>!S.done[i]);
+  const nextTxt=st==="done"?x.mcDoneNote:next<0?x.mcNextQuiz:x.mcNext(L(LESSONS[next].t));
+  const go=st==="done"?`<button class="btn ghost" data-open="cert">${ic("award")}${x.viewCert}</button>`:
+    `<button class="btn" data-open="${next<0?"quiz":next}">${st==="none"?t.start:t.cont}</button>`;
+  app.innerHTML=`<div class="page-head"><h1>${x.mcH}</h1><p class="muted">${x.mcP}</p></div>
+    <section class="card pad mycourse" aria-labelledby="mc-t">
+      <div class="mc-top"><span class="eyebrow">${x.mcCourse}</span>${pathPill()}</div>
+      <h2 id="mc-t">${L(COURSE_TITLE)}</h2>
+      ${completion()}
+      <div class="mc-foot"><span class="small">${nextTxt}</span>${go}</div></section>
+    <section class="card pad" id="progress" aria-labelledby="prog-h" style="margin-top:16px"><h2 id="prog-h" class="sec-h">${t.yourProg}</h2>
+      ${timeline()}${myProgress()}</section>`;
   bindReset();
 }
 /* The learner's own progress only: never other learners' data. */
 function myProgress(){
   const t=T(),x=R(),best=S.best===null?"–":Math.round(S.best*100)+(S.lang==="en"?"%":" %");
-  const cert=S.best!==null&&S.best>=.7&&doneCount()===LESSONS.length;
+  const cert=certOk();
   return `<div class="myprog"><ul>
       <li>${x.myLessons(doneCount(),LESSONS.length)}</li><li>${x.myQuiz(best)}</li>
       <li>${cert?x.myCertOk+` · <button class="linkbtn" data-open="cert">${x.viewCert}</button>`:x.myCertNo}</li></ul>
@@ -58,9 +82,8 @@ function timeline(){
 /* ---------- course ---------- */
 function course(){
   if(!pathReady(curPath())) return prepView();
-  const t=T();
-  if(view.lesson===null){ const f=LESSONS.findIndex((_,i)=>!S.done[i]); view.lesson=f<0?"quiz":f; }
-  const pct=Math.round(doneCount()/LESSONS.length*100);
+  if(view.lesson===null) return myCourses();
+  const t=T(),x=R();
   let body="";
   if(view.lesson==="quiz") body=quizView();
   else if(view.lesson==="cert") body=certView();
@@ -71,14 +94,13 @@ function course(){
       <div class="nav-row"><button class="btn quiet" data-open="${i-1}" ${i===0?'disabled':''}>${t.prev}</button>
       <button class="btn" data-complete="${i}">${last?t.toQuiz:(S.done[i]?t.next:t.markNext)}</button></div></div>`;
   }
-  app.innerHTML=`<section class="card pad">
-    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">${pathPill()}<div class="eyebrow">${t.yourProg} · ${pct}%</div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+  app.innerHTML=`<a class="backlink" href="#course">${x.mcBack}</a>
+    <section class="card pad">
+    <div class="course-head"><div><div class="eyebrow">${L(COURSE_TITLE)}</div>${completion()}</div>
+      <div class="course-acts">
         <button class="btn ${view.lesson==='quiz'?'':'ghost'}" data-open="quiz">${ic("quiz")}${t.quizTab}</button>
-        ${S.best!==null&&S.best>=.7&&doneCount()===6?`<button class="btn ${view.lesson==='cert'?'':'ghost'}" data-open="cert">${ic("award")}${t.certTab}</button>`:""}
+        ${certOk()?`<button class="btn ${view.lesson==='cert'?'':'ghost'}" data-open="cert">${ic("award")}${t.certTab}</button>`:""}
       </div></div>
-    <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>
     <div style="margin-top:16px">${timeline()}</div>${body}</section>`;
   if(view.lesson==="quiz") bindQuiz();
 }
@@ -121,7 +143,7 @@ function certView(){
   const d=new Date().toLocaleDateString(loc,{day:"numeric",month:"long",year:"numeric"});
   return `<div class="lesson"><h2>${t.certTab}</h2><label class="muted small" for="cn">${t.certHint}</label><br>
     <input type="text" id="cn" placeholder="${t.yourName}" value="${esc(S.name)}" style="margin-top:6px">
-    <div class="cert"><div class="eyebrow">${t.certEy}</div><h2>${L({en:"The European patent grant procedure",de:"Das europäische Patenterteilungsverfahren",fr:"La procédure de délivrance du brevet européen"})}</h2>
+    <div class="cert"><div class="eyebrow">${t.certEy}</div><h2>${L(COURSE_TITLE)}</h2>
     <div>${t.certFor}</div><div class="name" id="cno">${esc(S.name||t.yourName)}</div>
     <div>${t.certDid(Math.round((S.best||0)*100))}</div><p class="muted small" style="margin-top:16px">Patent Learning Lab · ${d}</p></div></div>`;
 }

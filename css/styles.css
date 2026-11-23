@@ -55,6 +55,7 @@
 body{margin:0;font-family:var(--font);font-size:var(--fs-base);line-height:var(--lh);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:var(--font);line-height:var(--lh-tight);margin:0 0 var(--s3);font-weight:var(--fw-semi);letter-spacing:-.005em;color:var(--text)}
 h1{font-size:var(--fs-h1)} h2{font-size:var(--fs-h2)} h3{font-size:var(--fs-h3)}
+h1,h2,h3{overflow-wrap:break-word;hyphens:auto}  /* long German compounds on phones */
 p{margin:0 0 var(--s4)}
 a{color:var(--primary);text-underline-offset:2px}
 a:hover{color:var(--primary-hover)}
@@ -246,6 +247,24 @@ footer .card{padding:var(--s4) var(--s5);background:transparent}
 .myprog li{margin:var(--s1) 0}
 .myprog-foot{display:flex;justify-content:space-between;gap:var(--s3);align-items:center;flex-wrap:wrap}
 .prep h1{margin-top:var(--s2)}
+/* learner: My courses and course header */
+.page-head{margin-bottom:var(--s5)}
+.page-head h1{margin-bottom:var(--s2)}
+.page-head p{margin:0;max-width:68ch}
+.sec-h{font-size:var(--fs-h3);margin-bottom:var(--s4)}
+.mc-top{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-bottom:var(--s3)}
+.mycourse h2{margin-bottom:var(--s4)}
+.completion{max-width:560px}
+.comp-row{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap}
+.comp-row b{font-weight:var(--fw-semi)}
+.completion .progress{margin:var(--s2) 0}
+.badge.prog{background:var(--primary-bg);border-color:#CBD8E0;color:var(--primary)}
+.mc-foot{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--border)}
+.backlink{display:inline-block;margin-bottom:var(--s3);font-size:var(--fs-sm);font-weight:var(--fw-semi)}
+.course-head{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s4);flex-wrap:wrap}
+.course-head>div:first-child{flex:1 1 280px}
+.course-head .eyebrow{margin-bottom:var(--s1)}
+.course-acts{display:flex;gap:var(--s2);flex-wrap:wrap}
 
 /* ---------- dashboards ---------- */
 .dash-head{margin-bottom:var(--s5)}

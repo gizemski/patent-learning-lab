@@ -20,7 +20,7 @@ Learners choose a patent system and work through a short micro-course, practise 
 | **Scenario quiz** | Six questions based on a fictional start-up and its real deadlines, with instant feedback, explanations and a 70% pass mark. |
 | **Certificate** | Unlocked after completing all lessons and passing the quiz. |
 | **AI tutor (mock-up)** | Answers only from a curated set of approved sources and always shows the source. If it can't answer reliably, it says so and hands the question over to a human expert. |
-| **Your progress** | Learners see only their own progress: lessons completed, best quiz score and certificate status. |
+| **My courses** | The selected course with its completion (percentage, status: not started, in progress or completed, and the next step), plus the learner's own progress: lesson timeline, lessons completed, best quiz score and certificate status. Learners see only their own data. |
 | **Roles (demo mode)** | A *View as: Learner / Instructor / Admin* switcher in the header, labelled *Demo mode – no real login*. See [Roles](#roles-demo-mode) below. |
 | **Instructor dashboard** | Course insights (completion, drop-off per lesson, difficulty per quiz question, learner regions) with each finding linked to a content change, a list of fictional demo learners and their progress, and a read-only content preview per lesson, optionally in all three languages side by side. Uses clearly labelled sample data. |
 | **Admin area** | Switch each pathway between *available* and *coming soon*, change the roles of fictional users, and review an activity log. Pathways switched on without content show learners an *in preparation* page. |
@@ -31,7 +31,7 @@ Learners choose a patent system and work through a short micro-course, practise 
 
 | Role | Sees |
 |---|---|
-| **Learner** | Home and pathway choice, the course (lessons, quiz, certificate), the AI tutor, *About*, and their own progress only. Never the instructor or admin views or other learners' data. |
+| **Learner** | Home and pathway choice, *My courses* with the course (lessons, quiz, certificate), the AI tutor, *About*, and their own progress only. Never the instructor or admin views or other learners' data. |
 | **Instructor** | The instructor dashboard (course insights, demo learners, content preview) and *About*. |
 | **Admin** | Everything instructors see, plus pathway management, users and roles, and the activity log. |
 

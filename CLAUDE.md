@@ -23,14 +23,14 @@ Guidance for working on **Patent Learning Lab**, a multilingual (English, German
 | `js/content/epo.js` | European pathway: `LESSONS`, `SCENARIO`, `QUIZ`, `SRC`, `KB`. One file per pathway with content (`js/content/<id>.js`) |
 | `js/demo-data.js` | Fictional sample data: `DATA` (insights), `PERSONAS`, `DEMO_LEARNERS`, `DEMO_USERS`, `DEMO_LOG_SEED` |
 | `js/state.js` | Learner state `S`, roles (`ROLES`, `PAGES`, `ROLE_HOME`, `canView()`), demo state `D`, `logEv()`, `pathAvail()`, `pathReady()` |
-| `js/views/learner.js` | `home`, `myProgress`, `prepView`, `course`, quiz, certificate, `tutor`, `about` |
+| `js/views/learner.js` | `home`, `myCourses` (with `completion()` and `myProgress`), `prepView`, `course`, quiz, certificate, `tutor`, `about` |
 | `js/views/instructor.js` | Chart and table helpers (`chartCard`, `rtable`, `subnav`, `dashHead`) and the `instructor` dashboard |
 | `js/views/admin.js` | `admin` area: pathways, users and roles, activity log |
 | `js/app.js` | `shell()`, `render()`, `route()` with the access check, event handling |
 
 Helpers: `T()`, `P()` and `R()` return the current language object of `UI`, `PX` and `RX`; `L(obj)` picks the current language from an `{en,de,fr}` object; `esc()` escapes HTML.
 
-Routes are hashes: `#home`, `#course`, `#tutor`, `#about`, `#instructor[/insights|learners|preview[/<lesson>|quiz]]`, `#admin[/pathways|users|log]`.
+Routes are hashes: `#home`, `#course` (*My courses*: the selected course, its completion and the learner's own progress), `#course/<1–n>|quiz|cert` (a lesson, the quiz, the certificate), `#tutor`, `#about`, `#instructor[/insights|learners|preview[/<lesson>|quiz]]`, `#admin[/pathways|users|log]`.
 
 ## Rules
 

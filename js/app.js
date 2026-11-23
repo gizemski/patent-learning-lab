@@ -37,6 +37,8 @@ function route(){
   }
   const prev=view.page+"/"+view.sub+"/"+view.pv;
   view.page=p; view.sub=sub;
+  /* #course = My courses; #course/<1..n> = a lesson; #course/quiz, #course/cert */
+  if(p==="course"){ const v=sub; view.lesson=v==="quiz"||v==="cert"?v:(v&&LESSONS[+v-1]?+v-1:null); }
   if(p==="instructor"&&sub==="preview"){ const v=parts[2]; view.pv=v==="quiz"?"quiz":(v!==undefined&&LESSONS[+v]?+v:0); } else view.pv=undefined;
   /* activity log: record what instructors/admins open (demo) */
   if(p==="instructor"&&prev!==p+"/"+view.sub+"/"+view.pv){
@@ -47,6 +49,11 @@ function route(){
   render();
 }
 
+/* Open a lesson (index), "quiz", "cert" or "" (My courses) through the hash, so Back works. */
+function openCourse(v){
+  const h="#course"+(v===""||v===null?"":"/"+(v==="quiz"||v==="cert"?v:+v+1));
+  if(location.hash===h){ route(); scrollTo(0,0); } else location.hash=h;
+}
 /* ---------- events ---------- */
 const tip=document.getElementById("tip");
 document.addEventListener("mousemove",e=>{const r=e.target.closest&&e.target.closest("[data-tip]");
@@ -67,10 +74,8 @@ document.addEventListener("click",e=>{
   const sc=e.target.closest("[data-scroll]"); if(sc){e.preventDefault();document.getElementById(sc.dataset.scroll).scrollIntoView({behavior:"smooth"});return;}
   const th=e.target.closest("[data-tohome]"); if(th&&view.page==="home"){e.preventDefault();document.getElementById("pathways").scrollIntoView({behavior:"smooth"});return;}
   if(th){e.preventDefault();location.hash="home";setTimeout(()=>{const el=document.getElementById("pathways");if(el)el.scrollIntoView();},60);return;}
-  const gq=e.target.closest("[data-goquiz]"); if(gq){view.lesson="quiz";}
-  const cp=e.target.closest("[data-complete]"); if(cp){const i=+cp.dataset.complete;if(!S.done[i])logEv("lesson",{lesson:i});S.done[i]=true;save();view.lesson=i<LESSONS.length-1?i+1:"quiz";render();scrollTo(0,0);return;}
-  const op=e.target.closest("[data-open]"); if(op){const v=op.dataset.open;if(v==="")return;view.lesson=(v==="quiz"||v==="cert")?v:+v;
-    if(view.page!=="course"){location.hash="course";} else {render();} scrollTo(0,0);return;}
+  const cp=e.target.closest("[data-complete]"); if(cp){const i=+cp.dataset.complete;if(!S.done[i])logEv("lesson",{lesson:i});S.done[i]=true;save();openCourse(i<LESSONS.length-1?i+1:"quiz");return;}
+  const op=e.target.closest("[data-open]"); if(op){const v=op.dataset.open; if(v==="")return; openCourse(v); return;}
   const ak=e.target.closest("[data-ask]"); if(ak){ask(ak.dataset.ask);return;}
   const tg=e.target.closest("[data-toggle]"); if(tg){const k=tg.dataset.toggle,c=document.querySelector(`[data-chart="${k}"]`),tb=document.querySelector(`[data-table="${k}"]`);
     const show=tb.hidden; tb.hidden=!show; c.hidden=show; tg.textContent=show?T().showChart:T().showTable;}

@@ -1,4 +1,7 @@
 /* Patent Learning Lab: European patent pathway content. Every fact checked against the official sources in SRC. */
+/* Course title, used on My courses and the certificate. */
+const COURSE_TITLE = {en:"The European patent grant procedure",de:"Das europäische Patenterteilungsverfahren",fr:"La procédure de délivrance du brevet européen"};
+
 const LESSONS = [
  {when:{en:"Day 0",de:"Tag 0",fr:"Jour 0"},
   t:{en:"Filing & formalities",de:"Anmeldung & Formalprüfung",fr:"Dépôt et formalités"},
